@@ -4,9 +4,9 @@ import { formatCurrency } from "@/app/utils/currency";
 import Image from "next/image";
 
 interface SorteioPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 async function SorteioPage({ params }: SorteioPageProps) {
