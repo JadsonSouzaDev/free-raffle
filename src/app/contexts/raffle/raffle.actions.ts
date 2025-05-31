@@ -51,3 +51,25 @@ export async function getRaffles(): Promise<Raffle[]> {
 
   return raffles;
 }
+
+export async function getRaffle(id: string): Promise<Raffle> {
+  "use server";
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  // get raffle
+  const rawRaffle = await sql`SELECT * FROM raffles WHERE id = ${id} AND active = true`;
+  if (rawRaffle.length === 0) {
+    throw new Error("Raffle not found");
+  }
+  const raffle = new Raffle(rawRaffle[0] as unknown as RaffleData);
+
+  // get prices
+  const prices = await sql`SELECT * FROM raffles_prices WHERE raffle_id = ${raffle.id}`;
+  raffle.setPrices(prices.map((price) => new RafflePrice(price as unknown as RafflePriceData)));
+
+  // get awarded quotes
+  const rawAwardedQuotes = await sql`SELECT * FROM raffles_awarded_quotes WHERE raffle_id = ${raffle.id}`;
+  raffle.setAwardedQuotes(rawAwardedQuotes.map((quote) => new RaffleAwardQuotes(quote as unknown as RaffleAwardQuotesData)));
+
+  return raffle;
+}
