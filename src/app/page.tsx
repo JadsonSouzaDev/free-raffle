@@ -7,7 +7,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Prêmios</h1>
+      <h1 className="text-xl md:text-2xl font-bold">Prêmios</h1>
       {raffles.map((raffle) => (
         <div
           key={raffle.id}

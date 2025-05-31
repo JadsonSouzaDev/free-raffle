@@ -117,7 +117,7 @@ const QuantityButton = ({
       } rounded-lg transition-colors duration-300 flex flex-col items-center justify-between relative`}
     >
       {isMostPopular && (
-        <span className=" bg-green-800 absolute -mt-6 text-xs font-bold px-2 py-1 md:rounded-b-sm">
+        <span className=" w-full text-center bg-green-800 absolute -mt-6 text-[10px] font-bold px-2 py-1 ">
           MAIS POPULAR
         </span>
       )}
