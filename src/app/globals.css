@@ -2,7 +2,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1f0a0a;
+  --foreground: #270c0c;
 }
 
 @theme inline {
@@ -13,7 +13,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #1f0a0a 0%, #3a1a1a 100%);
+  background-color: var(--foreground);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;

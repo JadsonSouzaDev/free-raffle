@@ -11,7 +11,7 @@ export function Navbar() {
           <Image src="https://caradebone.com/products/1704494621.png" alt="Logo" width={97} height={55} className="h-[40px] md:h-[50px] w-auto" />
         </div>
         <NavItem href="/" icon={<Home size={24} />} label="Início" />
-        <NavItem href="/orders" icon={<ShoppingBasket size={24} />} label="Minhas cotas" />
+        <NavItem href="/pedidos" icon={<ShoppingBasket size={24} />} label="Minhas cotas" />
         <NavItem href="/profile" icon={<User size={24} />} label="Entrar" />
       </div>
     </nav>

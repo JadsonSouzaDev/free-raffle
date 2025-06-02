@@ -4,8 +4,11 @@ import { CheckCircle, Minus, Plus } from "lucide-react";
 import QuantityButton from "./quantity-button";
 import { useMemo, useState } from "react";
 import { formatCurrency } from "@/app/utils/currency";
+import OrderModal from "./order-modal";
 
 interface SerializedRaffle {
+  id: string;
+  title: string;
   prices: {
     id: string;
     price: number;
@@ -15,6 +18,7 @@ interface SerializedRaffle {
 
 const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
   const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const [open, setOpen] = useState<boolean>(false);
 
   const currentPrice = useMemo(() => 
     [...raffle.prices]
@@ -102,7 +106,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <button disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-green-700 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
+        <button onClick={() => setOpen(true)} disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-green-700 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
           <div className="flex flex-row items-center justify-center mx-auto gap-3 p-2">
             <CheckCircle className="w-6 h-6 " />
             <span className="font-bold text-base md:text-lg">
@@ -114,6 +118,8 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
           </div>
         </button>
       </div>
+
+      <OrderModal open={open} onClose={() => setOpen(false)} raffleId={raffle.id} raffleTitle={raffle.title} quantity={selectedQuantity} />
     </div>
   );
 };

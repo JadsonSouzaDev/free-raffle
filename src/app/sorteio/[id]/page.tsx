@@ -73,6 +73,8 @@ async function SorteioPage({ params }: SorteioPageProps) {
 
       <QuantitySelector
         raffle={{
+          id: raffle.id,
+          title: raffle.title,
           prices: raffle.prices.map((price) => ({
             id: price.id,
             price: price.price,
