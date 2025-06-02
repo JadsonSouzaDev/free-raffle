@@ -29,6 +29,7 @@ async function SorteioPage({ params }: SorteioPageProps) {
               alt={raffle.title}
               width={640}
               height={360}
+              priority
               className="rounded-sm w-full max-h-[200px] md:max-h-[280px] object-cover"
             />
           )}
