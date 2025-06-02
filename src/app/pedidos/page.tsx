@@ -7,6 +7,7 @@ import { formatDate } from "../utils/data";
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface Order {
   id: string;
@@ -51,6 +52,9 @@ export default function PedidosPage() {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(
     orderIdParam
   );
+  const [currentWhatsapp, setCurrentWhatsapp] = useState<string | null>(
+    whatsappParam
+  );
 
   useEffect(() => {
     if (whatsappParam) {
@@ -58,12 +62,38 @@ export default function PedidosPage() {
     }
   }, [whatsappParam]);
 
+  // Função para conectar ao SSE
+  useEffect(() => {
+    if (!currentWhatsapp) return;
+
+    const eventSource = new EventSource("/api/webhooks/mercadopago");
+
+    eventSource.onmessage = async (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === "payment") {
+        // Atualiza a lista de pedidos
+        await handleWhatsappSubmit(currentWhatsapp);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE Error:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [currentWhatsapp]);
+
   const handleWhatsappSubmit = async (whatsapp: string) => {
     setLoading(true);
     try {
       const userOrders = await getOrdersByUser(whatsapp);
       setOrders(userOrders);
       setModalOpen(false);
+      setCurrentWhatsapp(whatsapp);
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
     } finally {
@@ -78,8 +108,6 @@ export default function PedidosPage() {
   const filteredOrders = orderIdParam
     ? orders.filter((order) => order.id === orderIdParam)
     : orders;
-
-  console.log(filteredOrders);
 
   return (
     <div className="flex flex-col gap-4">
@@ -104,15 +132,10 @@ export default function PedidosPage() {
               onClick={() =>
                 ["pending", "waiting_payment", "completed"].includes(
                   order.status
-                ) &&
-                toggleOrderExpansion(order.id)
+                ) && toggleOrderExpansion(order.id)
               }
             >
-              <div
-                className="flex justify-between items-center cursor-pointer"
-                
-                
-              >
+              <div className="flex justify-between items-center cursor-pointer">
                 <span className="font-bold">Pedido #{order.id.slice(-12)}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-sm opacity-70">
@@ -131,7 +154,9 @@ export default function PedidosPage() {
               </div>
               <div className="flex justify-between items-center">
                 {expandedOrderId !== order.id && (
-                  <span className="text-sm opacity-70">{order.quantity} cota(s)</span>
+                  <span className="text-sm opacity-70">
+                    {order.quantity} cota(s)
+                  </span>
                 )}
 
                 <span
@@ -193,6 +218,15 @@ export default function PedidosPage() {
           <span className="text-lg opacity-70">Nenhum pedido encontrado</span>
         </div>
       )}
+
+      {orderIdParam && <Link href="/pedidos">
+        <button
+          className="cursor-pointer bg-foreground text-white px-4 py-2 rounded-lg hover:bg-foreground/90"
+          onClick={() => setModalOpen(true)}
+        >
+          Visualizar todos os pedidos
+        </button>
+      </Link>}
     </div>
   );
 }

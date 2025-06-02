@@ -92,7 +92,6 @@ export async function orderPaid(orderId: string) {
        createdQuotes++;
        exclude.push(quote);
      } else {
-       console.log(`Quote ${quote} already exists`);
        exclude.push(quote);
      }
    }
@@ -143,7 +142,5 @@ export async function getOrdersByUser(rawWhatsapp: string) {
       SELECT serial_number FROM quotas WHERE order_id = ${order.id} AND active = true
     `).map((quota) => quota.serial_number) : [],
   })));
-
-  console.log(ordersWithQuotas);
   return ordersWithQuotas;
 }

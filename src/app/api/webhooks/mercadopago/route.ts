@@ -2,10 +2,57 @@ import { NextRequest } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import { orderPaid } from "@/app/contexts/order/order.actions";
+import { EventEmitter } from "events";
 
 const mercadopago = new MercadoPagoConfig({
   accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
 });
+
+// Interface para o tipo de dados do evento
+interface PaymentEvent {
+  type: 'payment' | 'connected';
+  orderId?: string;
+}
+
+// Criando um EventEmitter global para gerenciar os eventos de pagamento
+const paymentEvents = new EventEmitter();
+
+// Endpoint GET para SSE
+export async function GET(request: NextRequest) {
+  const headers = {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+  };
+
+  const stream = new TransformStream();
+  const writer = stream.writable.getWriter();
+  const encoder = new TextEncoder();
+
+  // Função para enviar eventos para o cliente
+  const sendEvent = async (data: PaymentEvent) => {
+    const eventString = `data: ${JSON.stringify(data)}\n\n`;
+    await writer.write(encoder.encode(eventString));
+  };
+
+  // Listener para eventos de pagamento
+  const onPayment = (orderId: string) => {
+    sendEvent({ type: 'payment', orderId });
+  };
+
+  // Registra o listener
+  paymentEvents.on('payment.approved', onPayment);
+
+  // Remove o listener quando a conexão for fechada
+  request.signal.addEventListener('abort', () => {
+    paymentEvents.off('payment.approved', onPayment);
+  });
+
+  // Envia um evento inicial para manter a conexão viva
+  sendEvent({ type: 'connected' });
+
+  return new Response(stream.readable, { headers });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,9 +92,10 @@ export async function POST(request: NextRequest) {
       WHERE gateway_id = ${paymentId}
     `;
 
-    // Se o pagamento foi aprovado, processa o pedido
+    // Se o pagamento foi aprovado, processa o pedido e emite o evento
     if (payment.status === "approved") {
       await orderPaid(orderId);
+      paymentEvents.emit('payment.approved', orderId);
     }
 
     return new Response("OK", { status: 200 });

@@ -41,7 +41,6 @@ const OrderModal = ({
   if (!open) return <></>;
 
   const handleWhatsappSubmit = async () => {
-    console.log("user", user);
     if (user) {
       setCustomer({ id: user.whatsapp, name: user.name });
       setName(user.name);
