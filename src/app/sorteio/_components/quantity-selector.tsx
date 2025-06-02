@@ -75,13 +75,13 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
       </div>
 
       <div className="flex flex-col gap-2 ">
-        <div className="flex flex-row items-center justify-between w-[300px] mx-auto gap-2 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground p-2">
+        <div className="flex flex-row items-center justify-between w-full md:w-[300px] mx-auto gap-2 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground p-2">
           <button
             onClick={() => handleQuantityClick(-1)}
             disabled={selectedQuantity <= 1}
             className="cursor-pointer bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Minus />
+            <Minus className="w-4 h-4" />
           </button>
           <input
             type="number"
@@ -89,21 +89,21 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
             onChange={(e) =>
               handleQuantityClick(Number(e.target.value) - selectedQuantity)
             }
-            className="font-bold text-2xl md:text-3xl w-20 text-center bg-transparent border-none focus:outline-none"
+            className="font-bold text-xl md:text-2xl w-20 text-center bg-transparent border-none focus:outline-none"
             min="0"
           />
           <button
             onClick={() => handleQuantityClick(1)}
             className="cursor-pointer bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center"
           >
-            <Plus />
+            <Plus className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
         <button disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-green-700 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
-          <div className="flex flex-row items-center justify-center mx-auto gap-3 py-3 p-2">
+          <div className="flex flex-row items-center justify-center mx-auto gap-3 p-2">
             <CheckCircle className="w-6 h-6 " />
             <span className="font-bold text-base md:text-lg">
               Quero participar

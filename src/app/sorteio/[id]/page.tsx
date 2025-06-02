@@ -2,6 +2,9 @@ import { getRaffle } from "@/app/contexts/raffle/raffle.actions";
 import { formatCurrency } from "@/app/utils/currency";
 import Image from "next/image";
 import QuantitySelector from "../_components/quantity-selector";
+import TopBuyers from "../_components/top-buyers";
+import AwardQuotes from "../_components/award-quotes";
+import { Gift } from "lucide-react";
 
 interface SorteioPageProps {
   params: Promise<{
@@ -43,8 +46,15 @@ async function SorteioPage({ params }: SorteioPageProps) {
           </h2>
         </div>
 
+        <TopBuyers />
+
+        <AwardQuotes />
+
         <div className="flex flex-col gap-2">
-          <h2 className="text-xl font-bold">Promoção</h2>
+          <div className="flex items-center gap-2">
+            <Gift className="w-5 h-5" />
+            <h2 className="text-lg font-bold">Promoção</h2>
+          </div>
           <div className="flex flex-row gap-2">
             {raffle.prices.slice(1).map((price) => (
               <div
@@ -61,19 +71,17 @@ async function SorteioPage({ params }: SorteioPageProps) {
         </div>
       </div>
 
-      <QuantitySelector raffle={{
-        prices: raffle.prices.map(price => ({
-          id: price.id,
-          price: price.price,
-          quantity: price.quantity
-        }))
-      }} />
+      <QuantitySelector
+        raffle={{
+          prices: raffle.prices.map((price) => ({
+            id: price.id,
+            price: price.price,
+            quantity: price.quantity,
+          })),
+        }}
+      />
     </div>
   );
 }
-
-
-
-
 
 export default SorteioPage;
