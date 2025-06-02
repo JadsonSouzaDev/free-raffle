@@ -68,7 +68,7 @@ export async function orderPaid(orderId: string) {
     SELECT * FROM orders WHERE id = ${orderId} AND status = 'waiting_payment' AND active = true LIMIT 1
   `;
 
-  if (!order) {
+  if (!order || order.length === 0) {
     throw new Error("Order not found or not waiting payment");
   }
 
