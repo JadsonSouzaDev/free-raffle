@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import WhatsappModal from "./_components/whatsapp-modal";
 import { getOrdersByUser } from "../contexts/order/order.actions";
 import { formatDate } from "../utils/data";
@@ -45,6 +45,18 @@ const statusColorMap = {
 };
 
 export default function PedidosPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex justify-center items-center p-8">
+        <span className="text-lg">Carregando...</span>
+      </div>
+    }>
+      <PedidosContent />
+    </Suspense>
+  );
+}
+
+function PedidosContent() {
   const searchParams = useSearchParams();
   const orderIdParam = searchParams.get("orderId");
   const whatsappParam = searchParams.get("whatsapp");
@@ -66,7 +78,6 @@ export default function PedidosPage() {
     }
   }, [whatsappParam]);
 
-  // Função para conectar ao SSE
   useEffect(() => {
     if (!currentWhatsapp) return;
 
@@ -76,7 +87,6 @@ export default function PedidosPage() {
       const data = JSON.parse(event.data);
 
       if (data.type === "payment") {
-        // Atualiza a lista de pedidos
         await handleWhatsappSubmit(currentWhatsapp);
       }
     };
@@ -91,7 +101,6 @@ export default function PedidosPage() {
     };
   }, [currentWhatsapp]);
 
-  // Adicionar novo useEffect para atualizar o tempo
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(Date.now());      
@@ -168,7 +177,7 @@ export default function PedidosPage() {
               <div className="flex justify-between items-center">
                 {expandedOrderId !== order.id && (
                   <span className="text-sm opacity-70">
-                    {order.quantity} cota(s)
+                    {order.status === "completed" ? `${order.quantity} cota(s)` : ''}
                   </span>
                 )}
                 <div className="flex items-center gap-2 ml-auto">
@@ -244,7 +253,7 @@ export default function PedidosPage() {
                           className="bg-green-700 text-white px-2 py-1 rounded-lg text-xs font-bold"
                           key={quota}
                         >
-                          {quota}
+                          {quota.toString().padStart(6, '0')}
                         </span>
                       ))}
                     </div>
@@ -263,14 +272,13 @@ export default function PedidosPage() {
       {orderIdParam && (
         <Link href="/pedidos">
           <div className="flex justify-center items-center ">
-
           <button
             className="cursor-pointer bg-foreground text-white px-4 py-2 rounded-lg hover:bg-foreground/90"
             onClick={() => setModalOpen(true)}
             >
             Visualizar todos os pedidos
           </button>
-            </div>
+          </div>
         </Link>
       )}
     </div>
