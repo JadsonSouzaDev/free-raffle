@@ -30,6 +30,14 @@ export async function POST(request: NextRequest) {
     
     const sql = neon(process.env.DATABASE_URL!);
 
+    // Caso já tenha sido pago, não faz nada
+    const paymentExists = await sql`
+      SELECT id FROM payments WHERE gateway_id = ${paymentId} AND status in ('approved', 'completed')
+    `;
+    if (paymentExists.length > 0) {
+      return new Response("OK", { status: 200 });
+    }
+
     // Atualiza o status do pagamento no banco
     await sql`
       UPDATE payments 
