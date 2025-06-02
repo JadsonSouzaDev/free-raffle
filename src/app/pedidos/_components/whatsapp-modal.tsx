@@ -82,7 +82,7 @@ const WhatsappModal = ({
             disabled={loading || !whatsapp || whatsapp.length !== 15 || isLoading}
             className="bg-foreground text-white p-2 rounded-lg disabled:opacity-50 cursor-pointer mt-4"
           >
-            {loading || isLoading ? "Carregando..." : "Ver Pedidos"}
+            {loading || isLoading ? "Carregando..." : "Ver pedidos"}
           </button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { getQuote } from "@/app/utils/quote";
 import { neon } from "@neondatabase/serverless";
 import { z } from "zod";
 import { createPayment } from "./payment.actions";
+import { formatTimeRemaining } from "@/app/utils/time";
 
 const MAX_NUMBER = 1000000;
 
@@ -120,12 +121,21 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const orders = await sql`
-    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64
+    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount
     FROM orders o
     LEFT JOIN payments p ON o.id = p.order_id
     WHERE o.user_id = ${whatsapp}
     ORDER BY o.created_at DESC
   `;
+
+  // If order is not completed, check if it has expired
+  const ordersToCheck = orders.filter((order) => order.status !== "completed");
+  for (const order of ordersToCheck) {
+    const timeRemaining = formatTimeRemaining(order.created_at);
+    if (timeRemaining === "Tempo esgotado") {
+      await sql`UPDATE orders SET status = 'expired' WHERE id = ${order.id}`;
+    }
+  }
 
   const ordersWithQuotas = await Promise.all(orders.map(async (order) => ({
     id: order.id,
@@ -135,6 +145,7 @@ export async function getOrdersByUser(rawWhatsapp: string) {
     status: order.status,
     createdAt: order.created_at,
     payment: order.gateway_qrcode ? {
+      amount: order.amount,
       qrCode: order.gateway_qrcode,
       qrCodeBase64: order.gateway_qrcode_base64,
     } : undefined,

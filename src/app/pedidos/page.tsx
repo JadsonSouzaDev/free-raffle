@@ -8,6 +8,8 @@ import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { formatCurrency } from "../utils/currency";
+import { formatTimeRemaining } from "../utils/time";
 
 interface Order {
   id: string;
@@ -19,6 +21,7 @@ interface Order {
   payment?: {
     qrCode: string;
     qrCodeBase64: string;
+    amount: number;
   };
   quotas: number[];
 }
@@ -46,6 +49,7 @@ export default function PedidosPage() {
   const orderIdParam = searchParams.get("orderId");
   const whatsappParam = searchParams.get("whatsapp");
 
+  const [currentTime, setCurrentTime] = useState(Date.now());
   const [modalOpen, setModalOpen] = useState(!orderIdParam || !whatsappParam);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
@@ -86,6 +90,15 @@ export default function PedidosPage() {
       eventSource.close();
     };
   }, [currentWhatsapp]);
+
+  // Adicionar novo useEffect para atualizar o tempo
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());      
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleWhatsappSubmit = async (whatsapp: string) => {
     setLoading(true);
@@ -158,14 +171,20 @@ export default function PedidosPage() {
                     {order.quantity} cota(s)
                   </span>
                 )}
-
-                <span
-                  className={`px-2 py-1 ml-auto rounded-lg text-sm ${
-                    statusColorMap[order.status as keyof typeof statusColorMap]
-                  }`}
-                >
-                  {statusMap[order.status as keyof typeof statusMap]}
-                </span>
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-sm opacity-70 font-bold">
+                    {order.payment?.amount ? formatCurrency(order.payment.amount) : "Não pago"}
+                  </span>
+                  <span
+                    className={`px-2 py-1 rounded-lg text-sm ${
+                      statusColorMap[
+                        order.status as keyof typeof statusColorMap
+                      ]
+                    }`}
+                  >
+                    {statusMap[order.status as keyof typeof statusMap]}
+                  </span>
+                </div>
               </div>
 
               {expandedOrderId === order.id && order.payment && (
@@ -174,6 +193,28 @@ export default function PedidosPage() {
                     <div className="flex flex-col items-center gap-4 mt-4 p-4 border-t">
                       <p className="text-sm text-center opacity-70">
                         Escaneie o QR Code abaixo para pagar via PIX
+                      </p>
+
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                          className="bg-foreground h-2.5 rounded-full transition-all duration-1000"
+                          style={{
+                            width: `${Math.max(
+                              0,
+                              Math.min(
+                                100,
+                                100 -
+                                  ((currentTime -
+                                    new Date(order.createdAt).getTime()) /
+                                    (5 * 60 * 1000)) *
+                                    100
+                              )
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-center opacity-70">
+                        Tempo restante para pagamento: {formatTimeRemaining(order.createdAt, currentTime)}
                       </p>
                       <Image
                         src={`data:image/png;base64,${order.payment?.qrCodeBase64}`}
@@ -219,14 +260,19 @@ export default function PedidosPage() {
         </div>
       )}
 
-      {orderIdParam && <Link href="/pedidos">
-        <button
-          className="cursor-pointer bg-foreground text-white px-4 py-2 rounded-lg hover:bg-foreground/90"
-          onClick={() => setModalOpen(true)}
-        >
-          Visualizar todos os pedidos
-        </button>
-      </Link>}
+      {orderIdParam && (
+        <Link href="/pedidos">
+          <div className="flex justify-center items-center ">
+
+          <button
+            className="cursor-pointer bg-foreground text-white px-4 py-2 rounded-lg hover:bg-foreground/90"
+            onClick={() => setModalOpen(true)}
+            >
+            Visualizar todos os pedidos
+          </button>
+            </div>
+        </Link>
+      )}
     </div>
   );
 }

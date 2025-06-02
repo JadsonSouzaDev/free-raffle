@@ -89,7 +89,7 @@ const OrderModal = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 backdrop-blur-xs text-foreground z-50">
       <div className="bg-white rounded-xl p-4 w-full max-w-md">
         <div className="flex flex-row justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Finalizar Compra</h2>
+          <h2 className="text-xl font-bold">Finalizar compra</h2>
           <button
             onClick={onClose}
             className="text-foreground cursor-pointer hover:text-foreground/80"
@@ -163,7 +163,7 @@ const OrderModal = ({
                 disabled={loading || !name}
                 className="bg-foreground text-white p-2 rounded-lg disabled:opacity-50 cursor-pointer mt-4"
               >
-                {loading ? "Processando..." : "Finalizar Compra"}
+                {loading ? "Processando..." : "Finalizar compra"}
               </button>
             </>
           )}
