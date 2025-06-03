@@ -26,7 +26,9 @@ export default function RootLayout({
       <body className={`${robotoSlab.className} antialiased`}>
         <main className="flex flex-col max-w-screen-sm mx-auto min-h-screen p-2 md:p-4 pt-18 md:pt-24 md:border-x border-white bg-white/95">
           <Navbar />
-          {children}
+          <div className="min-h-[calc(100vh-260px)] md:min-h-[calc(100vh-290px)]">
+            {children}
+          </div>
           <Footer />
         </main>
       </body>
