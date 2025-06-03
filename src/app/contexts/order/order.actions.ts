@@ -155,6 +155,8 @@ export async function getOrdersByUser(rawWhatsapp: string) {
     const timeRemaining = formatTimeRemaining(order.created_at);
     if (timeRemaining === "Tempo esgotado") {
       await sql`UPDATE orders SET status = 'expired' WHERE id = ${order.id}`;
+      await sql`UPDATE payments SET status = 'expired' WHERE order_id = ${order.id}`;
+      order.status = "expired";
     }
   }
 
