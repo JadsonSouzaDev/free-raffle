@@ -27,7 +27,8 @@ const Footer = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [isFaqSectionExpanded, setIsFaqSectionExpanded] = useState(false);
 
-  const isAdminRoute = usePathname().includes('/admin');
+  const pathname = usePathname();
+  const isAdminRoute = pathname.includes('/admin') || pathname.includes('/login') ;
 
   const toggleFaq = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
