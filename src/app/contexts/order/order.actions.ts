@@ -187,3 +187,42 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   );
   return ordersWithQuotas;
 }
+
+export async function getOrders() {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  const orders = await sql`
+    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount
+    FROM orders o
+    LEFT JOIN payments p ON o.id = p.order_id
+    ORDER BY o.created_at DESC
+  `;
+
+  const ordersWithQuotas = await Promise.all(
+    orders.map(async (order) => ({
+      id: order.id,
+      raffleId: order.raffle_id,
+      userId: order.user_id,
+      quotasQuantity: order.quotas_quantity,
+      status: order.status,
+      createdAt: order.created_at,
+      payment: order.gateway_qrcode
+        ? {
+            amount: order.amount,
+            qrCode: order.gateway_qrcode,
+            qrCodeBase64: order.gateway_qrcode_base64,
+          }
+        : undefined,
+      quotas:
+        order.status === "completed"
+          ? (
+              await sql`
+      SELECT serial_number FROM quotas WHERE order_id = ${order.id} AND active = true
+    `
+            ).map((quota) => quota.serial_number)
+          : [],
+    }))
+  );
+
+  return ordersWithQuotas;
+}

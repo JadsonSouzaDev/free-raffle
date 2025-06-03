@@ -1,6 +1,6 @@
 "use server";
 import { neon } from "@neondatabase/serverless";
-import { User } from "./user.entity";
+import { User, UserData } from "./user.entity";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import * as jose from 'jose';
@@ -88,8 +88,8 @@ export async function login(data: LoginFormData) {
 export async function getUsers() {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
-  const rawUsers = await sql`SELECT * FROM users`;
-  return rawUsers.map((user) => new User(user));
+  const rawUsers = await sql`SELECT * FROM users WHERE active = true ORDER BY created_at DESC`;
+  return rawUsers.map((user) => new User(user as unknown as UserData));
 }
 
 export async function getUserByWhatsapp(maskedWhatsapp: string) {

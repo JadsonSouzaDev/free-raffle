@@ -1,7 +1,99 @@
-export default function AdminPage() {
+import { getRaffles } from "../contexts/raffle/raffle.actions";
+import { getOrders } from "../contexts/order/order.actions";
+import { getUsers } from "../contexts/user/user.actions";
+import Common from "./_components/common";
+import { RaffleList } from "./_components/RaffleList";
+import { OrderList } from "./_components/OrderList";
+import { UserList } from "./_components/UserList";
+
+type OrderStatus = "pending" | "waiting_payment" | "completed" | "canceled" | "refunded" | "expired";
+
+export default async function AdminPage() {
+  // Aqui você pode buscar os dados reais dos sorteios
+  const raffles = await getRaffles();
+  const orders = await getOrders();
+  const users = await getUsers();
+
   return (
-    <div>
-      <h1>Admin</h1>
-    </div>
+    <Common 
+      tabs={[
+        {
+          label: "Sorteios",
+          content: (
+            <div>
+              <h2 className="text-xl font-bold mb-4">Gerenciar Sorteios</h2>
+              <RaffleList raffles={raffles.map((raffle) => ({
+                id: raffle.id,
+                title: raffle.title,
+                status: raffle.status,
+                createdAt: raffle.createdAt.toISOString(),
+                prices: raffle.prices.map((price) => ({
+                  id: price.id,
+                  price: price.price,
+                  quantity: price.quantity,
+                })),
+              }))} />
+            </div>
+          ),
+        },
+        {
+          label: "Pedidos",
+          content: (
+            <div>
+              <h2 className="text-xl font-bold mb-4">Gerenciar Pedidos</h2>
+              <OrderList
+                orders={orders.map((order: {
+                  id: string;
+                  raffleId: string;
+                  userId: string;
+                  quotasQuantity: number;
+                  status: OrderStatus;
+                  createdAt: Date;
+                  payment?: {
+                    amount: number;
+                  };
+                  quotas: number[];
+                }) => ({
+                  id: order.id,
+                  raffleId: order.raffleId,
+                  userId: order.userId,
+                  quantity: order.quotasQuantity,
+                  status: order.status,
+                  createdAt: order.createdAt.toISOString(),
+                  payment: order.payment,
+                  quotas: order.quotas,
+                }))}
+              />
+            </div>
+          ),
+        },
+        {
+          label: "Usuários",
+          content: (
+            <div>
+              <h2 className="text-xl font-bold mb-4">Gerenciar Usuários</h2>
+              <UserList
+                users={users.map((user) => ({
+                  whatsapp: user.whatsapp,
+                  name: user.name,
+                  roles: user.roles,
+                  createdAt: user.createdAt.toISOString(),
+                  updatedAt: user.updatedAt.toISOString(),
+                }))}
+              />
+            </div>
+          ),
+        },
+        {
+          label: "Infos",
+          content: (
+            <div>
+              <h2 className="text-xl font-bold mb-4">Infos</h2>
+              {/* Conteúdo da tab de configurações */}
+            </div>
+          ),
+        },
+      ]}
+    />
   );
 }

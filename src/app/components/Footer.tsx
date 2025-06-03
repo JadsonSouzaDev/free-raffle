@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronDown } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 const faqs = [
@@ -26,14 +27,17 @@ const Footer = () => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [isFaqSectionExpanded, setIsFaqSectionExpanded] = useState(false);
 
+  const isAdminRoute = usePathname().includes('/admin');
+
   const toggleFaq = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
   return (
     <footer className="flex flex-col items-center justify-center pt-20 pb-5">
-      <div className="flex flex-col gap-2 cursor-pointer">
-        <div className="border border-foreground/10 rounded-lg overflow-hidden cursor-pointer">
+      {!isAdminRoute && (
+      <div className="flex flex-col gap-2 cursor-pointer bg-white rounded-lg shadow-lg">
+        <div className="border border-foreground/10 rounded-lg overflow-hidden cursor-pointer p-4">
           <button
             onClick={() => setIsFaqSectionExpanded(!isFaqSectionExpanded)}
             className="w-full cursor-pointer flex items-center justify-between p-2 text-left hover:bg-foreground/5 transition-colors"
@@ -75,8 +79,9 @@ const Footer = () => {
               ))}
             </div>
           </div>
+          </div>
         </div>
-      </div>
+      )}
       <p className="text-sm text-foreground/50 mt-4">
         &copy; {new Date().getFullYear()} - Todos os direitos reservados
       </p>
