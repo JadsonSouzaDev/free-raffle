@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS quotas (
   order_id UUID REFERENCES orders(id),
   serial_number INTEGER NOT NULL,
   status VARCHAR(255) NOT NULL,
+  raffle_awarded_quote_id UUID REFERENCES raffles_awarded_quotes(id),
   active BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

@@ -30,6 +30,7 @@ const WhatsappModal = ({
     setLoading(true);
     try {
       onSubmit(whatsapp);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
     } finally {

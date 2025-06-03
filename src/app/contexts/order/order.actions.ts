@@ -77,30 +77,51 @@ export async function orderPaid(orderId: string) {
     UPDATE orders SET status = 'paid' WHERE id = ${orderId}
   `;
 
-   // Create quotes
-   const quotasQuantity = order[0].quotas_quantity;
-   const raffleId = order[0].raffle_id;
-   let createdQuotes = 0;
-   const exclude: number[] = [];
-   while (createdQuotes < quotasQuantity) {
-     const quote = getQuote(MAX_NUMBER, exclude);
-     const quotaAlreadyExists = await existsQuote(quote, raffleId);
-     if (!quotaAlreadyExists) {
-       await sql`
+  // Create quotes
+  const quotasQuantity = order[0].quotas_quantity;
+  const raffleId = order[0].raffle_id;
+  let createdQuotes = 0;
+  const exclude: number[] = [];
+  while (createdQuotes < quotasQuantity) {
+    const quote = getQuote(MAX_NUMBER, exclude);
+    const quotaAlreadyExists = await existsQuote(quote, raffleId);
+    if (!quotaAlreadyExists) {
+      const isAwarded = await getAwardedQuote(quote, raffleId);
+      if (isAwarded) {
+        await sql`
+          INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id)
+          VALUES (${quote}, ${raffleId}, ${orderId}, 'reserved', ${isAwarded})
+        `;
+      } else {
+        await sql`
          INSERT INTO quotas (serial_number, raffle_id, order_id, status)
          VALUES (${quote}, ${raffleId}, ${orderId}, 'reserved')
        `;
-       createdQuotes++;
-       exclude.push(quote);
-     } else {
-       exclude.push(quote);
-     }
-   }
+        createdQuotes++;
+        exclude.push(quote);
+      }
+    } else {
+      exclude.push(quote);
+    }
+  }
 
   // Update order status to paid
   await sql`
     UPDATE orders SET status = 'completed' WHERE id = ${orderId}
   `;
+}
+
+async function getAwardedQuote(
+  serialNumber: number,
+  raffleId: string
+): Promise<string | null> {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  const quote = await sql`
+    SELECT id FROM raffles_awarded_quotes WHERE reference_number = ${serialNumber} AND raffle_id = ${raffleId} AND active = true LIMIT 1
+  `;
+
+  return quote.length > 0 ? quote[0].id : null;
 }
 
 async function existsQuote(
@@ -117,7 +138,7 @@ async function existsQuote(
 }
 
 export async function getOrdersByUser(rawWhatsapp: string) {
-  const whatsapp = `+55${rawWhatsapp.replace(/\D/g, '')}`;
+  const whatsapp = `+55${rawWhatsapp.replace(/\D/g, "")}`;
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const orders = await sql`
@@ -137,21 +158,30 @@ export async function getOrdersByUser(rawWhatsapp: string) {
     }
   }
 
-  const ordersWithQuotas = await Promise.all(orders.map(async (order) => ({
-    id: order.id,
-    raffleId: order.raffle_id,
-    userId: order.user_id,
-    quantity: order.quotas_quantity,
-    status: order.status,
-    createdAt: order.created_at,
-    payment: order.gateway_qrcode ? {
-      amount: order.amount,
-      qrCode: order.gateway_qrcode,
-      qrCodeBase64: order.gateway_qrcode_base64,
-    } : undefined,
-    quotas: order.status === "completed" ? (await sql`
+  const ordersWithQuotas = await Promise.all(
+    orders.map(async (order) => ({
+      id: order.id,
+      raffleId: order.raffle_id,
+      userId: order.user_id,
+      quantity: order.quotas_quantity,
+      status: order.status,
+      createdAt: order.created_at,
+      payment: order.gateway_qrcode
+        ? {
+            amount: order.amount,
+            qrCode: order.gateway_qrcode,
+            qrCodeBase64: order.gateway_qrcode_base64,
+          }
+        : undefined,
+      quotas:
+        order.status === "completed"
+          ? (
+              await sql`
       SELECT serial_number FROM quotas WHERE order_id = ${order.id} AND active = true
-    `).map((quota) => quota.serial_number) : [],
-  })));
+    `
+            ).map((quota) => quota.serial_number)
+          : [],
+    }))
+  );
   return ordersWithQuotas;
 }
