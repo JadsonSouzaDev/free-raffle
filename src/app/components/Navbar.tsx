@@ -12,9 +12,9 @@ export function Navbar() {
             <Image src="https://caradebone.com/products/1704494621.png" alt="Logo" width={97} height={55} className="h-[40px] md:h-[50px] w-auto" />
           </div>
         </Link>
-        <NavItem href="/" icon={<Home size={24} />} label="Início" />
-        <NavItem href="/pedidos" icon={<ShoppingBasket size={24} />} label="Minhas cotas" />
-        <NavItem href="/profile" icon={<User size={24} />} label="Entrar" />
+        <NavItem href="/" icon={<Home className="w-5 h-5" />} label="Início" />
+        <NavItem href="/pedidos" icon={<ShoppingBasket className="w-5 h-5" />} label="Minhas cotas" />
+        <NavItem href="/profile" icon={<User className="w-5 h-5" />} label="Entrar" />
       </div>
     </nav>
   );
@@ -30,7 +30,7 @@ function NavItem({ href, icon, label }: NavItemProps) {
   return (
     <Link 
       href={href} 
-      className="text-white/70 hover:text-white transition-colors duration-200 flex items-center gap-2"
+      className="text-white hover:text-white/80 transition-colors duration-200 flex items-center gap-2"
     >
       {icon}
       <span className="hidden lg:inline">{label}</span>

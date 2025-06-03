@@ -23,8 +23,8 @@ const QuantityButton = ({
       onClick={onClick}
       className={`cursor-pointer ${
         isMostPopular
-          ? "bg-green-700 border-green-800 border-2"
-          : "bg-foreground border-foreground border-2"
+          ? "bg-green-700 border-green-800 border-2 hover:bg-green-800"
+          : "bg-foreground border-foreground border-2 hover:bg-foreground/90"
       } text-white px-3 ${
         isMostPopular ? "py-6" : "py-6"
       } rounded-lg transition-colors duration-300 flex flex-col items-center justify-between relative`}

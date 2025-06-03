@@ -83,9 +83,9 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
           <button
             onClick={() => handleQuantityClick(-1)}
             disabled={selectedQuantity <= 1}
-            className="cursor-pointer bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="cursor-pointer hover:bg-foreground/90 bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Minus className="w-4 h-4" />
+            <Minus className="w-5 h-5" />
           </button>
           <input
             type="number"
@@ -98,21 +98,21 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
           />
           <button
             onClick={() => handleQuantityClick(1)}
-            className="cursor-pointer bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center"
+            className="cursor-pointer hover:bg-foreground/90 bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <button onClick={() => setOpen(true)} disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-green-700 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
+        <button onClick={() => setOpen(true)} disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-green-700 hover:bg-green-800 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
           <div className="flex flex-row items-center justify-center mx-auto gap-3 p-2">
             <CheckCircle className="w-6 h-6 " />
             <span className="font-bold text-base md:text-lg">
               Quero participar
             </span>
-            <span className="font-bold text-lg md:text-xl bg-green-800 text-white px-2 py-1 rounded-md">
+            <span className="font-bold text-lg md:text-xl  border-white/60 border-2 text-white px-2 py-1 rounded-md">
               {formatCurrency(currentPrice * selectedQuantity)}
             </span>
           </div>
