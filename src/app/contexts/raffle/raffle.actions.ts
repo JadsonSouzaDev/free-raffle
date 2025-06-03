@@ -75,7 +75,7 @@ export async function getRaffle(id: string): Promise<Raffle> {
 
   const topBuyers = await sql`SELECT u.whatsapp, u.name, COUNT(q.id) as total 
   from quotas q join orders o on q.order_id = o.id join users u on o.user_id = u.whatsapp 
-  group by u.whatsapp, u."name" order by total limit 3`;
+  group by u.whatsapp, u."name" order by total desc limit 3`;
   raffle.setTopBuyers(topBuyers.map((buyer) => new RaffleTopBuyer(buyer as unknown as RaffleTopBuyerData)));
 
   return raffle;
