@@ -2,6 +2,7 @@ export type RaffleAwardQuotesData = {
   id: string;
   raffle_id: string;
   user_id: string;
+  user_name: string;
   reference_number: number;
   created_at: Date;
   updated_at: Date;
@@ -10,7 +11,10 @@ export type RaffleAwardQuotesData = {
 
 export class RaffleAwardQuotes {
   id!: string;
-  userId!: string;
+  user?: {
+    whatsapp: string;
+    name: string;
+  };
   referenceNumber!: number;
   createdAt!: Date;
   updatedAt!: Date;
@@ -19,13 +23,17 @@ export class RaffleAwardQuotes {
   constructor({
     id,
     user_id,
+    user_name,
     reference_number,
     created_at,
     updated_at,
     active,
   }: RaffleAwardQuotesData) {
     this.id = id;
-    this.userId = user_id;
+    this.user = user_id && user_name ? {
+      whatsapp: user_id,
+      name: user_name,
+    } : undefined;
     this.referenceNumber = reference_number;
     this.createdAt = created_at;
     this.updatedAt = updated_at;

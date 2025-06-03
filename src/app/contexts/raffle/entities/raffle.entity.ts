@@ -1,4 +1,4 @@
-import { RaffleAwardQuotes, RafflePrice } from "./";
+import { RaffleAwardQuotes, RafflePrice, RaffleTopBuyer } from "./";
 
 export type RaffleData = {
   id: string;
@@ -28,6 +28,7 @@ export class Raffle {
         quantity: number;
       }[]
     | null;
+  topBuyers?: RaffleTopBuyer[];
 
   constructor(data: RaffleData) {
     this.id = data.id;
@@ -46,6 +47,10 @@ export class Raffle {
 
   setAwardedQuotes(awarded_quotes: RaffleAwardQuotes[]) {
     this.awardedQuotes = awarded_quotes;
+  }
+
+  setTopBuyers(top_buyers: RaffleTopBuyer[]) {
+    this.topBuyers = top_buyers;
   }
 
   get status(): "active" | "finished" {

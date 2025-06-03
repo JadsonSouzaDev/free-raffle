@@ -3,7 +3,15 @@
 import { Medal, Trophy, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-const TopBuyers = () => {
+type TopBuyersProps = {
+  topBuyers?: {
+    id: string;
+    name: string;
+    quantity: number;
+  }[];
+}
+
+const TopBuyers = ({ topBuyers }: TopBuyersProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -21,25 +29,7 @@ const TopBuyers = () => {
       
       {isOpen && (
         <div className="grid grid-cols-3 gap-2">
-          {[
-            {
-              id: "1",
-              name: "Larissa Gomes de Farias",
-              quantity: 70168,
-            },
-            {
-              id: "2",
-              name: "Gabriel Henrique",
-              quantity: 68096,
-            },
-            {
-              id: "3",
-              name: "Riclaudio da  Oficina",
-              quantity: 47895,
-            },
-          ]
-            .slice(0, 3)
-            .map((buyer, index) => (
+          {topBuyers?.slice(0, 3).map((buyer, index) => (
               <div
                 key={buyer.id}
                 className={`flex flex-col items-center justify-center p-2 gap-1 rounded-lg text-center ${

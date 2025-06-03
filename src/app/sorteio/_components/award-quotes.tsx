@@ -3,7 +3,18 @@
 import { Flame, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-const AwardQuotes = () => {
+type AwardQuotesProps = {
+  awardedQuotes?: {
+    id: string;
+    referenceNumber: number;
+    user?: {
+      whatsapp: string;
+      name: string;
+    };
+  }[];
+}
+
+const AwardQuotes = ({ awardedQuotes }: AwardQuotesProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -23,12 +34,12 @@ const AwardQuotes = () => {
       
       {isOpen && (
         <div className="flex flex-row gap-1 items-center flex-wrap">
-          {[111111, 222222, 333333, 444444, 555555, 666666, 777777, 888888, 999999].map((number) => (
+          {awardedQuotes?.map((quote) => (
             <div
-              key={number}
-              className="bg-green-700 py-1 px-3 rounded-lg text-xs md:text-sm w-fit text-white"
+              key={quote.id}
+              className={`py-1 px-3 rounded-lg text-xs md:text-sm w-fit text-white ${!quote.user ? 'bg-green-700' : 'bg-foreground/20'}`}
             >
-              <span className="font-bold">{number.toString().padStart(6, '0')}</span>
+              <span className="font-bold">{quote.referenceNumber.toString().padStart(6, '0')}</span>
             </div>
           ))}
         </div>

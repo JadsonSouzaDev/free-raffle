@@ -47,7 +47,11 @@ async function SorteioPage({ params }: SorteioPageProps) {
           </h2>
         </div>
 
-        <AwardQuotes />
+        <AwardQuotes awardedQuotes={raffle.awardedQuotes?.map((quote) => ({
+          id: quote.id,
+          referenceNumber: quote.referenceNumber,
+          user: quote.user,
+        }))} />
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -81,7 +85,11 @@ async function SorteioPage({ params }: SorteioPageProps) {
           })),
         }}
       />
-      <TopBuyers />
+      <TopBuyers topBuyers={raffle.topBuyers?.map((buyer) => ({
+        id: buyer.whatsapp,
+        name: buyer.name,
+        quantity: buyer.total,
+      }))} />
 
       <div className="flex flex-col gap-2 text-foreground">
         <div className="flex items-center gap-2">

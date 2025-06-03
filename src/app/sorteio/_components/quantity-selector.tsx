@@ -112,7 +112,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
             <span className="font-bold text-base md:text-lg">
               Quero participar
             </span>
-            <span className="font-bold text-lg md:text-xl  border-white/60 border-2 text-white px-2 py-1 rounded-md">
+            <span className="font-bold text-base md:text-lg  border-white/60 border-2 text-white px-2 py-1 rounded-md">
               {formatCurrency(currentPrice * selectedQuantity)}
             </span>
           </div>

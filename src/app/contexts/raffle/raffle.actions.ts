@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import { Raffle, RaffleAwardQuotes, RaffleAwardQuotesData, RaffleData, RafflePrice, RafflePriceData } from "./entities";
+import { Raffle, RaffleAwardQuotes, RaffleAwardQuotesData, RaffleData, RafflePrice, RafflePriceData, RaffleTopBuyer, RaffleTopBuyerData } from "./entities";
 
 export async function createRaffle(formData: FormData) {
   "use server";
@@ -48,7 +48,6 @@ export async function getRaffles(): Promise<Raffle[]> {
     raffle.setAwardedQuotes(rawAwardedQuotes.map((quote) => new RaffleAwardQuotes(quote as unknown as RaffleAwardQuotesData)));
   }
 
-
   return raffles;
 }
 
@@ -68,8 +67,16 @@ export async function getRaffle(id: string): Promise<Raffle> {
   raffle.setPrices(prices.map((price) => new RafflePrice(price as unknown as RafflePriceData)));
 
   // get awarded quotes
-  const rawAwardedQuotes = await sql`SELECT * FROM raffles_awarded_quotes WHERE raffle_id = ${raffle.id}`;
+  const rawAwardedQuotes = await sql`SELECT raq.*, u.name as user_name 
+  FROM raffles_awarded_quotes raq LEFT JOIN users u on raq.user_id = u.whatsapp 
+  WHERE raq.raffle_id = ${raffle.id} and raq.active = true 
+  ORDER BY raq.reference_number ASC`;
   raffle.setAwardedQuotes(rawAwardedQuotes.map((quote) => new RaffleAwardQuotes(quote as unknown as RaffleAwardQuotesData)));
+
+  const topBuyers = await sql`SELECT u.whatsapp, u.name, COUNT(q.id) as total 
+  from quotas q join orders o on q.order_id = o.id join users u on o.user_id = u.whatsapp 
+  group by u.whatsapp, u."name" order by total limit 3`;
+  raffle.setTopBuyers(topBuyers.map((buyer) => new RaffleTopBuyer(buyer as unknown as RaffleTopBuyerData)));
 
   return raffle;
 }
