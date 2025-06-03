@@ -4,7 +4,7 @@ import { Flame, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 const AwardQuotes = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="flex flex-col gap-2">
@@ -22,13 +22,13 @@ const AwardQuotes = () => {
       </div>
       
       {isOpen && (
-        <div className="flex flex-row gap-1 items-center">
-          {[976167, 976168, 976169].map((number) => (
+        <div className="flex flex-row gap-1 items-center flex-wrap">
+          {[111111, 222222, 333333, 444444, 555555, 666666, 777777, 888888, 999999].map((number) => (
             <div
               key={number}
-              className="bg-green-700 py-1 px-3 rounded-lg text-sm w-fit text-white"
+              className="bg-green-700 py-1 px-3 rounded-lg text-xs md:text-sm w-fit text-white"
             >
-              <span className="font-bold">{number}</span>
+              <span className="font-bold">{number.toString().padStart(6, '0')}</span>
             </div>
           ))}
         </div>

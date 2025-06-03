@@ -4,7 +4,7 @@ import Image from "next/image";
 import QuantitySelector from "../_components/quantity-selector";
 import TopBuyers from "../_components/top-buyers";
 import AwardQuotes from "../_components/award-quotes";
-import { Gift } from "lucide-react";
+import { Gift, Info } from "lucide-react";
 
 interface SorteioPageProps {
   params: Promise<{
@@ -18,24 +18,25 @@ async function SorteioPage({ params }: SorteioPageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl md:text-2xl font-bold text-center">
-        {raffle.title}
-      </h1>
       <div
         key={raffle.id}
         className="flex flex-col gap-4 p-3 md:p-4 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground"
       >
-        <div className="flex justify-center">
-          {raffle.imagesUrls[0] && (
-            <Image
-              src={raffle.imagesUrls[0]}
-              alt={raffle.title}
-              width={640}
-              height={360}
-              priority
-              className="rounded-sm w-full max-h-[200px] md:max-h-[280px] object-cover"
-            />
-          )}
+        <div className="flex flex-col justify-center">
+          <div className="relative w-full h-[230px] md:h-[320px]">
+            {raffle.imagesUrls[0] && (
+              <Image
+                src={raffle.imagesUrls[0]}
+                alt={raffle.title}
+                fill
+                priority
+                className="rounded-sm object-cover"
+              />
+            )}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r  from-foreground to-foreground/60 text-white py-2 px-2">
+              <h1 className="text-xl md:text-2xl font-bold">{raffle.title}</h1>
+            </div>
+          </div>
         </div>
         <div className="flex flex-col gap-2 items-center">
           <h2 className="text-sm md:text-base">
@@ -45,8 +46,6 @@ async function SorteioPage({ params }: SorteioPageProps) {
             </span>
           </h2>
         </div>
-
-        <TopBuyers />
 
         <AwardQuotes />
 
@@ -82,6 +81,15 @@ async function SorteioPage({ params }: SorteioPageProps) {
           })),
         }}
       />
+      <TopBuyers />
+
+      <div className="flex flex-col gap-2 text-foreground">
+        <div className="flex items-center gap-2">
+          <Info className="w-5 h-5" />
+          <h2 className="text-lg font-bold">Descrição e regras:</h2>
+        </div>
+        <p className="text-sm font-normal">{raffle.description}</p>
+      </div>
     </div>
   );
 }

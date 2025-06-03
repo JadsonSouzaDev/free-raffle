@@ -4,7 +4,7 @@ import { Medal, Trophy, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 const TopBuyers = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="flex flex-col gap-2">
@@ -13,7 +13,7 @@ const TopBuyers = () => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Trophy className="w-5 h-5" />
-        <h2 className="text-lgs font-bold">Top Compradores</h2>
+        <h2 className="text-lg font-bold">Top Compradores</h2>
         <div className="flex items-center p-1 rounded-full bg-foreground/20 animate-pulse">
           <ChevronDown className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>

@@ -16,8 +16,8 @@ export async function createPixPayment(input: CreatePixPaymentInput) {
   
   // Cria data de expiração para 5 minutos a partir de agora
   const expirationDate = new Date();
-  expirationDate.setMinutes(expirationDate.getMinutes() + 5);
-  
+  expirationDate.setMinutes(expirationDate.getMinutes() + 65); // 1 hora e 5 minutos que na verdade é 5 minutos
+
   const paymentData = await payment.create({
     body: {
       transaction_amount: input.amount,
