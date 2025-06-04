@@ -70,9 +70,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 py-8 rounded-xl bg-white items-center justify-center border border-white shadow-lg text-foreground">
+    <div className="flex flex-col gap-4 p-4 py-8 rounded-xl bg-white/10 items-center justify-center border border-white/10 shadow-lg text-white">
       <div>
-        <h2 className="text-center text-3xl font-extrabold text-foreground">
+        <h2 className="text-center text-3xl font-extrabold">
           Faça seu login
         </h2>
       </div>
@@ -80,7 +80,7 @@ export default function LoginPage() {
       <form className="space-y-6 w-full pt-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label htmlFor="whatsapp" className="text-sm font-medium text-foreground">
+            <label htmlFor="whatsapp" className="text-sm font-medium text-white">
               WhatsApp
             </label>
             <input
@@ -88,14 +88,14 @@ export default function LoginPage() {
               name="whatsapp"
               type="text"
               required
-              className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-foreground/50 placeholder-foreground/50 text-foreground focus:outline-none focus:ring-foreground focus:border-foreground focus:z-10 sm:text-sm"
+              className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-white/50 placeholder-white/50 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm"
               placeholder="Digite seu WhatsApp"
               value={formData.whatsapp}
               onChange={handleInputChange}
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="text-sm font-medium text-foreground">
+            <label htmlFor="password" className="text-sm font-medium text-white">
               Senha
             </label>
             <input
@@ -103,7 +103,7 @@ export default function LoginPage() {
               name="password"
               type="password"
               required
-              className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-foreground/50 placeholder-foreground/50 text-foreground focus:outline-none focus:ring-foreground focus:border-foreground focus:z-10 sm:text-sm"
+              className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-white/50 placeholder-white/50 text-white focus:outline-none focus:ring-white focus:border-white focus:z-10 sm:text-sm"
               placeholder="Digite sua senha"
               value={formData.password}
               onChange={handleInputChange}
