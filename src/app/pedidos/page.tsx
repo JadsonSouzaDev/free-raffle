@@ -36,12 +36,12 @@ const statusMap = {
 };
 
 const statusColorMap = {
-  pending: "bg-yellow-500/20 text-yellow-700",
-  waiting_payment: "bg-yellow-500/20 text-yellow-700",
-  completed: "bg-green-500/20 text-green-700",
-  canceled: "bg-red-500/20 text-red-700",
-  refunded: "bg-red-500/20 text-red-700",
-  expired: "bg-red-500/20 text-red-700",
+  pending: "bg-yellow-500 text-yellow-700",
+  waiting_payment: "bg-yellow-400 text-yellow-700",
+  completed: "bg-green-500/50 text-white",
+  canceled: "bg-red-500/50 text-white",
+  refunded: "bg-yellow-500/50 text-white",
+  expired: "bg-red-500/50 text-white",
 };
 
 export default function PedidosPage() {
@@ -150,7 +150,7 @@ function PedidosContent() {
           {filteredOrders.map((order) => (
             <div
               key={order.id}
-              className="flex cursor-pointer flex-col gap-2 p-4 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground"
+              className="flex cursor-pointer flex-col gap-2 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-white"
               onClick={() =>
                 ["pending", "waiting_payment", "completed"].includes(
                   order.status
@@ -181,7 +181,7 @@ function PedidosContent() {
                   </span>
                 )}
                 <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-sm opacity-70 font-bold">
+                  <span className="text-sm opacity-80 font-bold">
                     {order.payment?.amount ? formatCurrency(order.payment.amount) : "Não pago"}
                   </span>
                   <span
@@ -250,7 +250,7 @@ function PedidosContent() {
                     <div className="flex flex-wrap gap-2">
                       {order.quotas.map((quota) => (
                         <span
-                          className="bg-green-700 text-white px-2 py-1 rounded-lg text-xs font-bold"
+                          className="bg-red-700 text-white px-2 py-1 rounded-lg text-xs font-bold"
                           key={quota}
                         >
                           {quota.toString().padStart(6, '0')}

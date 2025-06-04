@@ -37,11 +37,11 @@ const Footer = () => {
   return (
     <footer className="flex flex-col items-center justify-center pt-20 pb-5">
       {!isAdminRoute && (
-      <div className="flex flex-col gap-2 cursor-pointer bg-white rounded-lg shadow-lg">
-        <div className="border border-foreground/10 rounded-lg overflow-hidden cursor-pointer p-4">
+      <div className="flex bg-white/10 flex-col gap-2 cursor-pointer rounded-lg shadow-lg">
+        <div className="border border-white/10 rounded-lg overflow-hidden cursor-pointer p-4">
           <button
             onClick={() => setIsFaqSectionExpanded(!isFaqSectionExpanded)}
-            className="w-full cursor-pointer flex items-center justify-between p-2 text-left hover:bg-foreground/5 transition-colors"
+            className="w-full cursor-pointer flex items-center justify-between p-2 text-left  transition-colors"
           >
             <h2 className="font-bold text-sm">Perguntas Frequentes</h2>
             <span className={`transform transition-transform ${isFaqSectionExpanded ? 'rotate-180' : ''}`}>
@@ -56,11 +56,11 @@ const Footer = () => {
               {faqs.map((faq, index) => (
                 <div 
                   key={index}
-                  className="border border-foreground/10 rounded-lg overflow-hidden"
+                  className="border border-white/10 rounded-lg overflow-hidden"
                 >
                   <button
                     onClick={() => toggleFaq(index)}
-                    className="w-full cursor-pointer flex items-center justify-between p-2 text-left hover:bg-foreground/5 transition-colors"
+                    className="w-full cursor-pointer flex items-center justify-between p-2 text-left hover:bg-white/10 transition-colors"
                   >
                     <h3 className="font-semibold text-xs">{faq.pergunta}</h3>
                     <span className={`transform transition-transform ${expandedIndex === index ? 'rotate-180' : ''}`}>
@@ -72,7 +72,7 @@ const Footer = () => {
                       expandedIndex === index ? 'max-h-40' : 'max-h-0'
                     }`}
                   >
-                    <p className=" text-foreground/80 p-2 pt-0 text-xs">
+                    <p className=" text-white/80 p-2 pt-0 text-xs">
                       {faq.resposta}
                     </p>
                   </div>
@@ -83,7 +83,7 @@ const Footer = () => {
           </div>
         </div>
       )}
-      <p className="text-sm text-foreground/50 mt-4">
+      <p className="text-sm text-white/50 mt-4">
         &copy; {new Date().getFullYear()} - Todos os direitos reservados
       </p>
     </footer>

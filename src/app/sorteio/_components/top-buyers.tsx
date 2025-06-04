@@ -38,7 +38,7 @@ const TopBuyers = ({ topBuyers }: TopBuyersProps) => {
                     : "bg-foreground/10 opacity-70"
                 }`}
               >
-                <span className="font-bold text-foreground/70 flex items-center gap-1">
+                <span className="font-bold flex items-center gap-1">
                   {index === 0 ? (
                     <>
                       <Trophy className="w-5 h-5 " />
@@ -52,7 +52,7 @@ const TopBuyers = ({ topBuyers }: TopBuyersProps) => {
                   )}
                 </span>
                 <span className="text-sm w-full">{buyer.name}</span>
-                <span className="font-bold text-sm">{buyer.quantity} cotas</span>
+                <span className="font-bold text-sm">{buyer.quantity} cota(s)</span>
               </div>
             ))}
         </div>

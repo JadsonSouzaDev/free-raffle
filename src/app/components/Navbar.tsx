@@ -43,7 +43,7 @@ export function Navbar() {
 
   return (
     <nav
-      className="w-full -ml-2 md:-ml-[17px] sm:max-w-[calc(640px)] fixed top-0 z-10 px-4 md:px-6 py-3 shadow-lg border
+      className="w-full -ml-2 md:-ml-[17px] sm:max-w-[calc(641px)] fixed top-0 z-10 px-4 md:px-6 py-3 shadow-lg border
     bg-foreground border-none text-white"
     >
       <div className="flex justify-between items-center gap-8">

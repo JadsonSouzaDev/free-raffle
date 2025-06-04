@@ -4,6 +4,7 @@ export type RaffleAwardQuotesData = {
   user_id: string;
   user_name: string;
   reference_number: number;
+  gift: string;
   created_at: Date;
   updated_at: Date;
   active: boolean;
@@ -16,6 +17,7 @@ export class RaffleAwardQuotes {
     name: string;
   };
   referenceNumber!: number;
+  gift!: string;
   createdAt!: Date;
   updatedAt!: Date;
   active!: boolean;
@@ -25,6 +27,7 @@ export class RaffleAwardQuotes {
     user_id,
     user_name,
     reference_number,
+    gift,
     created_at,
     updated_at,
     active,
@@ -35,6 +38,7 @@ export class RaffleAwardQuotes {
       name: user_name,
     } : undefined;
     this.referenceNumber = reference_number;
+    this.gift = gift;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.active = active;

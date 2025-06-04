@@ -1,12 +1,13 @@
 "use client";
 
-import { Flame, ChevronDown } from "lucide-react";
+import { Flame, ChevronDown, CheckCircle, Trophy } from "lucide-react";
 import { useState } from "react";
 
 type AwardQuotesProps = {
   awardedQuotes?: {
     id: string;
     referenceNumber: number;
+    gift: string;
     user?: {
       whatsapp: string;
       name: string;
@@ -37,9 +38,14 @@ const AwardQuotes = ({ awardedQuotes }: AwardQuotesProps) => {
           {awardedQuotes?.map((quote) => (
             <div
               key={quote.id}
-              className={`py-1 px-3 rounded-lg text-xs md:text-sm w-fit text-white ${!quote.user ? 'bg-green-700' : 'bg-foreground/20'}`}
+              className={`grid grid-cols-3 w-full py-2 px-3 rounded-lg text-sm text-white ${!quote.user ? 'bg-foreground/50' : 'bg-red-700'}`}
             >
-              <span className="font-bold">{quote.referenceNumber.toString().padStart(6, '0')}</span>
+              <span className={`flex w-[70px] items-center justify-center px-2 py-1 rounded-lg font-bold ${!quote.user ? 'text-white bg-white/40 ' : 'bg-white text-foreground'}`}>{quote.referenceNumber.toString().padStart(6, '0')}</span>
+              <span className="font-normal text-center">{quote.gift}</span>
+              <div className="flex items-center justify-end gap-x-2">
+                <span className="font-normal text-right">{quote.user?.name ? quote.user.name : 'Disponível'}</span>
+                {!quote.user ? <CheckCircle className="w-4 h-4" /> : <Trophy className="w-4 h-4" />}
+              </div>
             </div>
           ))}
         </div>

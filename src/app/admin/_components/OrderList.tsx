@@ -72,7 +72,7 @@ export function OrderList({ orders }: { orders: Order[] }) {
             <span
               className={`px-2 py-1 rounded-lg text-xs font-medium ${
                 value === "completed"
-                  ? "bg-green-100 text-green-800"
+                  ? "bg-red-100 text-red-800"
                   : value === "waiting_payment" || value === "pending"
                   ? "bg-yellow-100 text-yellow-800"
                   : "bg-red-100 text-red-800"

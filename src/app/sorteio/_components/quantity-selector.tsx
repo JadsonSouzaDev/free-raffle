@@ -33,7 +33,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-3 gap-2 md:hidden">
+      <div className="grid grid-cols-3 gap-1 md:hidden">
         {[
           ...new Set([
             25,
@@ -54,7 +54,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
             />
           ))}
       </div>
-      <div className="md:grid md:grid-cols-4 gap-2 hidden ">
+      <div className="md:grid md:grid-cols-4 gap-1 hidden">
         {[
           ...new Set([
             10,
@@ -79,7 +79,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
       </div>
 
       <div className="flex flex-col gap-2 ">
-        <div className="flex flex-row items-center justify-between w-full md:w-[300px] mx-auto gap-2 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground p-2">
+        <div className="flex flex-row items-center justify-between w-full md:w-[300px] mx-auto gap-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-foreground p-2">
           <button
             onClick={() => handleQuantityClick(-1)}
             disabled={selectedQuantity <= 1}
@@ -93,7 +93,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
             onChange={(e) =>
               handleQuantityClick(Number(e.target.value) - selectedQuantity)
             }
-            className="font-bold text-xl md:text-2xl w-20 text-center bg-transparent border-none focus:outline-none"
+            className="font-bold text-white text-xl md:text-2xl w-20 text-center bg-transparent border-none focus:outline-none"
             min="0"
           />
           <button
@@ -106,7 +106,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
       </div>
 
       <div className="flex flex-col gap-2">
-        <button onClick={() => setOpen(true)} disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-green-700 hover:bg-green-800 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
+        <button onClick={() => setOpen(true)} disabled={selectedQuantity < 1} className="cursor-pointer w-full bg-red-700 hover:bg-red-800 text-white shadow-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed">
           <div className="flex flex-row items-center justify-center mx-auto gap-3 p-2">
             <CheckCircle className="w-6 h-6 " />
             <span className="font-bold text-base md:text-lg">

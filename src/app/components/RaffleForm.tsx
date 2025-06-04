@@ -60,7 +60,7 @@ export function RaffleForm({ onSubmit }: { onSubmit: (formData: FormData) => Pro
           <button
             type="button"
             onClick={addPriceField}
-            className="text-sm bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
+            className="text-sm bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700"
           >
             + Adicionar Preço
           </button>

@@ -49,11 +49,11 @@ export function DataList<T>({
 
   // Visualização em cards para mobile
   const MobileView = () => (
-    <div className="grid grid-cols-1 gap-4 text-foreground">
+    <div className="grid grid-cols-1 gap-4 text-white bg-white/10">
       {data.map((item, index) => (
         <div
           key={index}
-          className="bg-white rounded-lg shadow p-4 border border-foreground/10"
+          className="bg-white/10 rounded-lg shadow p-4 border border-foreground/10"
         >
           {fields.map((field) => (
             <div key={field.key as string} className="flex flex-col gap-1 mb-2">

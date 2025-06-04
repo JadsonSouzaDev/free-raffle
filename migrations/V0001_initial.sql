@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS raffles_awarded_quotes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   raffle_id UUID REFERENCES raffles(id),
   user_id VARCHAR(14) REFERENCES users(whatsapp),
+  gift VARCHAR(255) NOT NULL,
   reference_number INTEGER NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),

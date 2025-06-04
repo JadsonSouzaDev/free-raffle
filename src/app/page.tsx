@@ -9,7 +9,7 @@ const statuses = {
 };
 
 const statusColors = {
-  active: "bg-green-700",
+  active: "bg-red-700",
   finished: "bg-red-700",
 };
 
@@ -27,7 +27,7 @@ export default async function Home() {
         if (index === 0) {
           return (
             <Link key={`${raffle.id}-${index}`} href={`/sorteio/${raffle.id}`}>
-              <div className="flex flex-col gap-2 p-3 md:p-4 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground">
+              <div className="flex flex-col gap-2 p-3 md:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-white">
                 <div className="flex flex-col justify-center">
                   <div className="relative w-full h-[230px] md:h-[320px]">
                     {raffle.imagesUrls[0] && (
@@ -46,12 +46,12 @@ export default async function Home() {
                     </div>
                   </div>
                 </div>
-                <p className="text-sm opacity-80 line-clamp-1 md:line-clamp-none">
+                <p className="text-sm opacity-90 line-clamp-1 md:line-clamp-none">
                   {raffle.description}
                 </p>
 
                 <div className="flex justify-center">
-                  <button className={`animate-pulse text-sm md:text-base cursor-pointer border font-bold mt-2 px-6 py-2 ${statusColors[raffle.status]} text-white rounded-lg transition-colors duration-300`}>
+                  <button className={`animate-pulse text-sm md:text-base cursor-pointer border border-red-600 font-bold mt-2 px-6 py-2 ${statusColors[raffle.status]} text-white rounded-lg transition-colors duration-300`}>
                     {statuses[raffle.status]}
                   </button>
                 </div>
@@ -64,7 +64,7 @@ export default async function Home() {
           <Link
             key={`${raffle.id}-${index}`}
             href={`/sorteio/${raffle.id}`}
-            className="flex flex-row items-center gap-3 p-2 rounded-lg bg-white backdrop-blur-sm border border-white shadow-md text-foreground hover:bg-gray-50 transition-colors duration-200"
+            className="flex flex-row items-center gap-3 p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/10 shadow-md text-white transition-colors duration-200"
           >
             {raffle.imagesUrls[0] && (
               <Image

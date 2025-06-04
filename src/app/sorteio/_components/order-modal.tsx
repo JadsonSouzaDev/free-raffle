@@ -99,7 +99,7 @@ const OrderModal = ({
         </div>
 
         <div className="flex flex-col gap-2 pb-8">
-          <div className="flex border border-green-700 rounded-lg p-2 bg-green-700/10 text-green-700">
+          <div className="flex border border-red-700 rounded-lg p-2 bg-red-700/10 text-red-700">
             <p className="text-base">
               Você está comprando <span className="font-bold">{quantity}</span>{" "}
               cota(s) do sorteio{" "}

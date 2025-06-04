@@ -17,13 +17,13 @@ async function SorteioPage({ params }: SorteioPageProps) {
   const raffle = await getRaffle(id);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 text-white">
       <div
         key={raffle.id}
-        className="flex flex-col gap-4 p-3 md:p-4 rounded-xl bg-white backdrop-blur-sm border border-white shadow-lg text-foreground"
+        className="flex flex-col gap-4 py-3 md:p-4 text-white"
       >
         <div className="flex flex-col justify-center">
-          <div className="relative w-full h-[230px] md:h-[320px]">
+          <div className="relative w-full h-[230px] md:h-[320px] rounded-xl overflow-hidden shadow-lg">
             {raffle.imagesUrls[0] && (
               <Image
                 src={raffle.imagesUrls[0]}
@@ -47,12 +47,6 @@ async function SorteioPage({ params }: SorteioPageProps) {
           </h2>
         </div>
 
-        <AwardQuotes awardedQuotes={raffle.awardedQuotes?.map((quote) => ({
-          id: quote.id,
-          referenceNumber: quote.referenceNumber,
-          user: quote.user,
-        }))} />
-
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Gift className="w-5 h-5" />
@@ -62,7 +56,7 @@ async function SorteioPage({ params }: SorteioPageProps) {
             {raffle.prices.slice(1).map((price) => (
               <div
                 key={price.id}
-                className="bg-green-700 py-1 px-3 rounded-lg text-sm w-fit text-white"
+                className="bg-red-700 py-1 px-3 rounded-lg text-sm w-fit text-white"
               >
                 <span className="">{price.quantity} cotas por </span>
                 <span className="font-bold">
@@ -85,13 +79,24 @@ async function SorteioPage({ params }: SorteioPageProps) {
           })),
         }}
       />
-      <TopBuyers topBuyers={raffle.topBuyers?.map((buyer) => ({
-        id: buyer.whatsapp,
-        name: buyer.name,
-        quantity: buyer.total,
-      }))} />
+      <TopBuyers
+        topBuyers={raffle.topBuyers?.map((buyer) => ({
+          id: buyer.whatsapp,
+          name: buyer.name,
+          quantity: buyer.total,
+        }))}
+      />
 
-      <div className="flex flex-col gap-2 text-foreground">
+      <AwardQuotes
+        awardedQuotes={raffle.awardedQuotes?.map((quote) => ({
+          id: quote.id,
+          gift: quote.gift,
+          referenceNumber: quote.referenceNumber,
+          user: quote.user,
+        }))}
+      />
+
+      <div className="flex flex-col gap-2 text-white">
         <div className="flex items-center gap-2">
           <Info className="w-5 h-5" />
           <h2 className="text-lg font-bold">Descrição e regras:</h2>
