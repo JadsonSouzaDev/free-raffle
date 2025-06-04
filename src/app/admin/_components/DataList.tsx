@@ -21,6 +21,7 @@ interface DataListProps<T> {
   fields: FieldConfig<T>[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onDeleteCondition?: (item: T) => boolean;
   onSort?: (sortConfig: SortConfig) => void;
   sortConfig?: SortConfig;
   onCreate?: () => void;
@@ -31,6 +32,7 @@ export function DataList<T>({
   fields,
   onEdit,
   onDelete,
+  onDeleteCondition,
   onSort,
   sortConfig,
   onCreate,
@@ -91,7 +93,7 @@ export function DataList<T>({
                   <span className="text-xs">Editar</span>
                 </button>
               )}
-              {onDelete && (
+              {onDelete && onDeleteCondition?.(item) && (
                 <button
                   onClick={() => onDelete(item)}
                   className="flex items-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-600/90 rounded-lg transition-colors text-white"
@@ -164,7 +166,7 @@ export function DataList<T>({
                       <Pencil className="w-4 h-4" />
                     </button>
                   )}
-                  {onDelete && (
+                  {onDelete && onDeleteCondition?.(item) && (
                     <button
                       onClick={() => onDelete(item)}
                       className="cursor-pointer p-1 text-red-600 hover:bg-red-600/10 rounded-lg transition-colors"

@@ -32,6 +32,7 @@ export default async function AdminPage() {
                 raffles={raffles.map((raffle) => ({
                   id: raffle.id,
                   title: raffle.title,
+                  description: raffle.description,
                   status: raffle.status,
                   createdAt: raffle.createdAt.toISOString(),
                   prices: raffle.prices.map((price) => ({
@@ -39,6 +40,11 @@ export default async function AdminPage() {
                     price: price.price,
                     quantity: price.quantity,
                   })),
+                  awardedQuotes: raffle.awardedQuotes?.map((quote) => ({
+                    id: quote.id,
+                    referenceNumber: quote.referenceNumber,
+                    gift: quote.gift,
+                  })) || [],
                 }))}
               />
             </div>

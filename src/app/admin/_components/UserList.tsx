@@ -57,7 +57,7 @@ export function UserList({ users }: { users: User[] }) {
           key: "createdAt",
           label: "Cadastro",
           render: (value) => (
-            <span className="text-xs text-foreground/50">
+            <span className="">
               {formatDate(value as string)}
             </span>
           ),
@@ -68,6 +68,9 @@ export function UserList({ users }: { users: User[] }) {
       }}
       onDelete={(user) => {
         console.log("Deletar usuário", user);
+      }}
+      onDeleteCondition={(user) => {
+        return !user.roles.includes("admin");
       }}
     />
   );
