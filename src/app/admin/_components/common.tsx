@@ -14,8 +14,8 @@ const Tab = ({ label, isActive, onClick }: TabProps) => {
       onClick={onClick}
       className={`cursor-pointer px-4 py-2 text-sm font-medium rounded-t-lg transition-colors duration-200 ${
         isActive
-          ? "bg-foreground text-white "
-          : "bg-foreground/60 text-white hover:bg-foreground/80"
+          ? "bg-white/10 text-white "
+          : "bg-foreground/40 text-white hover:bg-foreground/20"
       }`}
     >
       {label}
@@ -42,7 +42,7 @@ const Common = ({ children, tabs }: CommonProps) => {
   }
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col text-white">
       <div className="flex ">
         {tabs.map((tab, index) => (
           <Tab
@@ -53,7 +53,7 @@ const Common = ({ children, tabs }: CommonProps) => {
           />
         ))}
       </div>
-      <div className="p-4 bg-foreground rounded-lg shadow-lg rounded-tl-none">
+      <div className="p-4 bg-white/10 rounded-lg shadow-lg rounded-tl-none text-white">
         {tabs[activeTab].content}
       </div>
     </div>

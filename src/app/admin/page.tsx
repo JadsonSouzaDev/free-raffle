@@ -6,7 +6,13 @@ import { RaffleList } from "./_components/RaffleList";
 import { OrderList } from "./_components/OrderList";
 import { UserList } from "./_components/UserList";
 
-type OrderStatus = "pending" | "waiting_payment" | "completed" | "canceled" | "refunded" | "expired";
+type OrderStatus =
+  | "pending"
+  | "waiting_payment"
+  | "completed"
+  | "canceled"
+  | "refunded"
+  | "expired";
 
 export default async function AdminPage() {
   // Aqui você pode buscar os dados reais dos sorteios
@@ -15,24 +21,26 @@ export default async function AdminPage() {
   const users = await getUsers();
 
   return (
-    <Common 
+    <Common
       tabs={[
         {
           label: "Sorteios",
           content: (
             <div>
               <h2 className="text-xl font-bold mb-4">Gerenciar Sorteios</h2>
-              <RaffleList raffles={raffles.map((raffle) => ({
-                id: raffle.id,
-                title: raffle.title,
-                status: raffle.status,
-                createdAt: raffle.createdAt.toISOString(),
-                prices: raffle.prices.map((price) => ({
-                  id: price.id,
-                  price: price.price,
-                  quantity: price.quantity,
-                })),
-              }))} />
+              <RaffleList
+                raffles={raffles.map((raffle) => ({
+                  id: raffle.id,
+                  title: raffle.title,
+                  status: raffle.status,
+                  createdAt: raffle.createdAt.toISOString(),
+                  prices: raffle.prices.map((price) => ({
+                    id: price.id,
+                    price: price.price,
+                    quantity: price.quantity,
+                  })),
+                }))}
+              />
             </div>
           ),
         },
@@ -42,27 +50,33 @@ export default async function AdminPage() {
             <div>
               <h2 className="text-xl font-bold mb-4">Gerenciar Pedidos</h2>
               <OrderList
-                orders={orders.map((order: {
-                  id: string;
-                  raffleId: string;
-                  userId: string;
-                  quotasQuantity: number;
-                  status: OrderStatus;
-                  createdAt: Date;
-                  payment?: {
-                    amount: number;
-                  };
-                  quotas: number[];
-                }) => ({
-                  id: order.id,
-                  raffleId: order.raffleId,
-                  userId: order.userId,
-                  quantity: order.quotasQuantity,
-                  status: order.status,
-                  createdAt: order.createdAt.toISOString(),
-                  payment: order.payment,
-                  quotas: order.quotas,
-                }))}
+                orders={orders.map(
+                  (order: {
+                    id: string;
+                    raffleId: string;
+                    userId: string;
+                    quotasQuantity: number;
+                    status: OrderStatus;
+                    createdAt: Date;
+                    payment?: {
+                      amount: number;
+                      gateway: string;
+                      type: string;
+                    };
+                    quotas: number[];
+                  }) => ({
+                    id: order.id,
+                    raffleId: order.raffleId,
+                    userId: order.userId,
+                    quantity: order.quotasQuantity,
+                    status: order.status,
+                    createdAt: order.createdAt.toISOString(),
+                    amount: order.payment?.amount || 0,
+                    gateway: order.payment?.gateway || "",
+                    type: order.payment?.type || "pix",
+                    quotas: order.quotas,
+                  })
+                )}
               />
             </div>
           ),

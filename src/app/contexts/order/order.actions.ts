@@ -192,7 +192,7 @@ export async function getOrders() {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const orders = await sql`
-    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount
+    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount, p.gateway
     FROM orders o
     LEFT JOIN payments p ON o.id = p.order_id
     ORDER BY o.created_at DESC
@@ -204,13 +204,16 @@ export async function getOrders() {
       raffleId: order.raffle_id,
       userId: order.user_id,
       quotasQuantity: order.quotas_quantity,
-      status: order.status,
+      status: order.status === "completed" ? order.status : 
+        (new Date().getTime() - new Date(order.created_at).getTime() > 5 * 60 * 1000) ? "expired" : order.status,
       createdAt: order.created_at,
       payment: order.gateway_qrcode
         ? {
             amount: order.amount,
             qrCode: order.gateway_qrcode,
             qrCodeBase64: order.gateway_qrcode_base64,
+            gateway: order.gateway,
+            type:  "pix",
           }
         : undefined,
       quotas:

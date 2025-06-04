@@ -70,7 +70,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 py-8 rounded-xl bg-white/10 items-center justify-center border border-white/10 shadow-lg text-white">
+    <div className="flex flex-col max-w-sm mx-auto gap-4 p-4 py-8 rounded-xl bg-white/10 items-center justify-center border border-white/10 shadow-lg text-white">
       <div>
         <h2 className="text-center text-3xl font-extrabold">
           Faça seu login
