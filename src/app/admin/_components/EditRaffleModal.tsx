@@ -101,7 +101,7 @@ const EditRaffleModal = ({ raffleId, isOpen, onClose, onSuccess }: EditRaffleMod
   }
 
   return (
-    <div className={`fixed inset-0 bg-black/50 flex items-center backdrop-blur-xs justify-center z-50 ${isOpen ? 'block' : 'hidden'}`}>
+    <div className={`fixed inset-0 bg-black/50 p-4 flex items-center backdrop-blur-xs justify-center z-50 ${isOpen ? 'block' : 'hidden'}`}>
       <div className="bg-white text-foreground rounded-lg p-6 w-full max-w-2xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Editar Sorteio</h2>
