@@ -4,6 +4,7 @@ import { User, UserData } from "./user.entity";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import * as jose from 'jose';
+import { DEFAULT_PAGINATION, PaginationRequest } from "../common/pagination";
 
 const createUserSchema = z.object({
   name: z.string().min(1),
@@ -85,11 +86,31 @@ export async function login(data: LoginFormData) {
   }
 }
 
-export async function getUsers() {
+export async function getUsers({ search, pagination }: { search?: string, pagination: PaginationRequest } = {pagination: DEFAULT_PAGINATION}) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
-  const rawUsers = await sql`SELECT * FROM users WHERE active = true ORDER BY created_at DESC`;
-  return rawUsers.map((user) => new User(user as unknown as UserData));
+  const where = sql`WHERE active = true ${search ? sql`AND (name ILIKE ${`%${search}%`} OR whatsapp ILIKE ${`%${search}%`})` : sql``}`;
+
+  const countQuery = await sql`SELECT COUNT(*) FROM users ${where}`;
+  const count = countQuery[0].count;
+
+  const rawUsers = await sql`SELECT * FROM users ${where} ORDER BY created_at DESC LIMIT ${pagination.limit} OFFSET ${(pagination.page - 1) * pagination.limit}`;
+  const user = rawUsers.map((user) => new User(user as unknown as UserData));
+  const data = user.map((user) => ({
+    whatsapp: user.whatsapp,
+    name: user.name,
+    roles: user.roles,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt
+  }));
+
+  return {
+    data,
+    total: count,
+    page: pagination.page,
+    limit: pagination.limit,
+    totalPages: Math.ceil(count / pagination.limit)
+  }
 }
 
 export async function getUserByWhatsapp(maskedWhatsapp: string) {
@@ -123,7 +144,7 @@ export async function getUsersSelectOptions({search}: {search?: string} = {}) {
     WHERE active = true ${search ? 
       sql`AND (name ILIKE ${`%${search}%`} OR whatsapp ILIKE ${`%${search}%`})` : sql``} 
     ORDER BY created_at DESC
-    LIMIT 10`;
+    `;
   return rawUsers.map((user) => ({
     id: user.whatsapp,
     name: user.name

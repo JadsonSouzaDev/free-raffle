@@ -19,7 +19,8 @@ export default async function AdminPage() {
   const raffles = await getRaffles();
   const ordersResponse = await getOrders();
   const { data: orders, ...ordersPagination } = ordersResponse;
-  const users = await getUsers();
+  const usersResponse = await getUsers();
+  const { data: users, ...usersPagination } = usersResponse;
 
   return (
     <Common
@@ -104,6 +105,7 @@ export default async function AdminPage() {
                   createdAt: user.createdAt.toISOString(),
                   updatedAt: user.updatedAt.toISOString(),
                 }))}
+                initialPagination={usersPagination}
               />
             </div>
           ),

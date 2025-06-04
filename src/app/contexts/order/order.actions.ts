@@ -5,7 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import { z } from "zod";
 import { createPayment } from "./payment.actions";
 import { formatTimeRemaining } from "@/app/utils/time";
-import { PaginationRequest } from "../common/pagination";
+import { DEFAULT_PAGINATION, PaginationRequest } from "../common/pagination";
 
 const MAX_NUMBER = 1000000;
 
@@ -191,7 +191,7 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   return ordersWithQuotas;
 }
 
-export async function getOrders({ raffleId, userId, pagination } : { raffleId?: string, userId?: string, pagination: PaginationRequest } = {pagination: {page: 1, limit: 10}}) {
+export async function getOrders({ raffleId, userId, pagination } : { raffleId?: string, userId?: string, pagination: PaginationRequest } = {pagination: DEFAULT_PAGINATION}) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const where = sql`

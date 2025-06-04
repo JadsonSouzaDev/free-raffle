@@ -78,13 +78,10 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
   useEffect(() => {
     if (ordersData) {
       const {data, ...rest} = ordersData;
-      console.log(rest);
       setFilteredOrders(data as unknown as Order[]);
       setPaginationResponse(rest);
     }
   }, [ordersData, pagination]);
-
-  console.log(ordersData);
   return (
     <>
       <div className="flex flex-col gap-2 mb-4">
