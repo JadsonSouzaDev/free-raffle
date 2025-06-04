@@ -1,4 +1,6 @@
-import { RaffleAwardQuotes, RafflePrice, RaffleTopBuyer } from "./";
+import { RaffleAwardQuotes, RafflePrice, RaffleTopBuyer, RaffleFlag } from "./";
+import { RaffleHighestQuota } from "./raffle-highest-quota.entity";
+import { RaffleLowestQuota } from "./raffle-lowest-quota.entity";
 
 export type RaffleData = {
   id: string;
@@ -22,15 +24,13 @@ export class Raffle {
   updatedAt!: Date;
   prices!: RafflePrice[];
   awardedQuotes?: RaffleAwardQuotes[];
-  topQuotes?:
-    | {
-        user_id: string;
-        quantity: number;
-      }[]
-    | null;
   topBuyers?: RaffleTopBuyer[];
+  topBuyersWeek?: RaffleTopBuyer[];
+  topBuyersDay?: RaffleTopBuyer[];
+  lowestQuota?: RaffleLowestQuota;
+  highestQuota?: RaffleHighestQuota;
   quotasSold?: number;
-
+  flags!: RaffleFlag;
   constructor(data: RaffleData) {
     this.id = data.id;
     this.title = data.title;
@@ -55,8 +55,28 @@ export class Raffle {
     this.topBuyers = top_buyers;
   }
 
+  setTopBuyersWeek(top_buyer_week: RaffleTopBuyer[]) {
+    this.topBuyersWeek = top_buyer_week;
+  }
+
+  setTopBuyersDay(top_buyer_day: RaffleTopBuyer[]) {
+    this.topBuyersDay = top_buyer_day;
+  }
+
+  setLowestQuota(lowest_quota: RaffleLowestQuota) {
+    this.lowestQuota = lowest_quota;
+  }
+
+  setHighestQuota(highest_quota: RaffleHighestQuota) {
+    this.highestQuota = highest_quota;
+  }
+
   setQuotasSold(quotas_sold: number) {
     this.quotasSold = quotas_sold;
+  }
+
+  setFlags(flags: RaffleFlag) {
+    this.flags = flags;
   }
 
   get status(): "active" | "finished" {

@@ -5,6 +5,7 @@ import QuantitySelector from "../_components/quantity-selector";
 import TopBuyers from "../_components/top-buyers";
 import AwardQuotes from "../_components/award-quotes";
 import { Gift, Info } from "lucide-react";
+import { getEndOfDay, getEndOfWeek, getStartOfDay, getStartOfWeek } from "@/app/utils/date";
 
 interface SorteioPageProps {
   params: Promise<{
@@ -15,6 +16,10 @@ interface SorteioPageProps {
 async function SorteioPage({ params }: SorteioPageProps) {
   const { id } = await params;
   const raffle = await getRaffle(id);
+  const flags = raffle.flags;
+
+  const topBuyersWeekSubtitle = `(${new Date(getStartOfWeek()).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} a ${new Date(getEndOfWeek()).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}) `;
+  const topBuyersDaySubtitle = `(${new Date(getStartOfDay()).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })} a ${new Date(getEndOfDay()).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })})`;
 
   return (
     <div className="flex flex-col gap-6 text-white">
@@ -79,13 +84,54 @@ async function SorteioPage({ params }: SorteioPageProps) {
           })),
         }}
       />
-      <TopBuyers
+      {flags.flagTopBuyers && <TopBuyers title="Top compradores"
         topBuyers={raffle.topBuyers?.map((buyer) => ({
           id: buyer.whatsapp,
           name: buyer.name,
           quantity: buyer.total,
         }))}
-      />
+      />}
+
+      {flags.flagTopBuyersWeek && <TopBuyers title="Top compradores da semana"
+        subtitle={topBuyersWeekSubtitle}
+        topBuyers={raffle.topBuyersWeek?.map((buyer) => ({
+          id: buyer.whatsapp,
+          name: buyer.name,
+          quantity: buyer.total,
+        }))}
+      />}
+
+      {flags.flagTopBuyersDay && <TopBuyers
+        title="Top compradores do dia"
+        subtitle={topBuyersDaySubtitle}
+        topBuyers={raffle.topBuyersDay?.map((buyer) => ({
+          id: buyer.whatsapp,
+          name: buyer.name,
+          quantity: buyer.total,
+        }))}
+      />}
+
+      {flags.flagHighestQuota && <TopBuyers
+        title="Maior cota"
+        isReferenceNumber
+        topBuyers={raffle.highestQuota ? [{
+          id: raffle.highestQuota?.whatsapp,
+          name: raffle.highestQuota?.name,
+          quantity: 1,
+          referenceNumber: raffle.highestQuota?.referenceNumber.toString().padStart(6, '0'),
+        }] : []}
+      />}
+
+      {flags.flagLowestQuota && <TopBuyers
+        title="Menor cota"
+        isReferenceNumber
+        topBuyers={raffle.lowestQuota ? [{
+          id: raffle.lowestQuota?.whatsapp,
+          name: raffle.lowestQuota?.name,
+          quantity: 1,
+          referenceNumber: raffle.lowestQuota?.referenceNumber.toString().padStart(6, '0'),
+        }] : []}
+      />}
 
       <AwardQuotes
         awardedQuotes={raffle.awardedQuotes?.map((quote) => ({

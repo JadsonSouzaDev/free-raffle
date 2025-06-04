@@ -20,6 +20,17 @@ CREATE TABLE IF NOT EXISTS raffles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS raffles_flags (
+  id UUID PRIMARY KEY REFERENCES raffles(id),
+  flag_top_buyers BOOLEAN DEFAULT false,
+  flag_top_buyers_week BOOLEAN DEFAULT false,
+  flag_top_buyers_day BOOLEAN DEFAULT false,
+  flag_lowest_quota BOOLEAN DEFAULT false,
+  flag_highest_quota BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS raffles_prices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   raffle_id UUID REFERENCES raffles(id),

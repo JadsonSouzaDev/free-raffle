@@ -12,7 +12,7 @@ async function isValidToken(token: string): Promise<boolean> {
     await jose.jwtVerify(token, secret);
     return true;
   } catch (error) {
-    console.log("error:", error);
+    console.error("error:", error);
     return false;
   }
 }
