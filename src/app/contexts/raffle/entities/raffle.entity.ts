@@ -29,6 +29,7 @@ export class Raffle {
       }[]
     | null;
   topBuyers?: RaffleTopBuyer[];
+  quotasSold?: number;
 
   constructor(data: RaffleData) {
     this.id = data.id;
@@ -39,6 +40,7 @@ export class Raffle {
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
     this.mainWinnerId = data.main_winner_id;
+    this.quotasSold = 0;
   }
 
   setPrices(prices: RafflePrice[]) {
@@ -51,6 +53,10 @@ export class Raffle {
 
   setTopBuyers(top_buyers: RaffleTopBuyer[]) {
     this.topBuyers = top_buyers;
+  }
+
+  setQuotasSold(quotas_sold: number) {
+    this.quotasSold = quotas_sold;
   }
 
   get status(): "active" | "finished" {

@@ -115,3 +115,17 @@ export async function getUserByWhatsapp(maskedWhatsapp: string) {
 export async function generatePasswordHash(password: string) {
   return bcrypt.hash(password, 10);
 }
+
+export async function getUsersSelectOptions({search}: {search?: string} = {}) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  const rawUsers = await sql`SELECT whatsapp, name 
+    FROM users 
+    WHERE active = true ${search ? 
+      sql`AND (name ILIKE ${`%${search}%`} OR whatsapp ILIKE ${`%${search}%`})` : sql``} 
+    ORDER BY created_at DESC
+    LIMIT 10`;
+  return rawUsers.map((user) => ({
+    id: user.whatsapp,
+    name: user.name
+  }));
+}

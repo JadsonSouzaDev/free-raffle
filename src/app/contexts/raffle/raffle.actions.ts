@@ -1,8 +1,8 @@
+"use server";
 import { neon } from "@neondatabase/serverless";
 import { Raffle, RaffleAwardQuotes, RaffleAwardQuotesData, RaffleData, RafflePrice, RafflePriceData, RaffleTopBuyer, RaffleTopBuyerData } from "./entities";
 
 export async function createRaffle(formData: FormData) {
-  "use server";
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   // create raffle
@@ -46,6 +46,10 @@ export async function getRaffles(): Promise<Raffle[]> {
     // get awarded quotes
     const rawAwardedQuotes = await sql`SELECT * FROM raffles_awarded_quotes WHERE raffle_id = ${raffle.id}`;
     raffle.setAwardedQuotes(rawAwardedQuotes.map((quote) => new RaffleAwardQuotes(quote as unknown as RaffleAwardQuotesData)));
+
+    // get quotas sold
+    const quotasSold = await sql`SELECT COUNT(*) FROM quotas WHERE raffle_id = ${raffle.id}`;
+    raffle.setQuotasSold(quotasSold[0].count);
   }
 
   return raffles;
@@ -79,4 +83,13 @@ export async function getRaffle(id: string): Promise<Raffle> {
   raffle.setTopBuyers(topBuyers.map((buyer) => new RaffleTopBuyer(buyer as unknown as RaffleTopBuyerData)));
 
   return raffle;
+}
+
+export async function getRafflesSelectOptions(): Promise<{ id: string; title: string }[]> {
+  "use server";
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  // get raffles
+  const rawRaffles = await sql`SELECT id, title FROM raffles WHERE active = true ORDER BY created_at DESC`;
+  return rawRaffles.map((raffle) => ({ id: raffle.id, title: raffle.title }));
 }

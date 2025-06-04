@@ -13,6 +13,7 @@ type RaffleListProps = {
     status: "active" | "finished";
     description: string;
     createdAt: string;
+    quotasSold: number;
     awardedQuotes: {
       id: string;
       referenceNumber: number;
@@ -69,6 +70,16 @@ export function RaffleList({ raffles }: RaffleListProps) {
           ),
         },
         {
+          key: "quotasSold",
+          label: "Cotas",
+          render: (value) => (
+            <div className="flex gap-1 w-[150px] items-center">
+              <span className="text-xs px-2 py-1 rounded-xl font-bold bg-foreground/70 text-white">{(999999 - (value as number)).toString().padStart(6, '0')} L</span>
+              <span className="text-xs px-2 py-1 rounded-xl font-bold bg-green-500 text-white">{(value as number).toString().padStart(6, '0')} P</span>
+            </div>
+          ),
+        },
+        {
           key: "description",
           label: "Descrição",
           onlyDetail: true,
@@ -111,6 +122,7 @@ export function RaffleList({ raffles }: RaffleListProps) {
         {
           key: "createdAt",
           label: "Data de criação",
+          onlyDetail: true,
           render: (value) => formatDate(value as string),
         },
       ]}

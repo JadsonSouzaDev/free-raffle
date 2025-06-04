@@ -1,8 +1,21 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Eye, Pencil, Trash } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  Eye,
+  Loader2,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import { useState } from "react";
 import { DetailModal } from "./DetailModal";
+import {
+  PaginationRequest,
+  PaginationResponse,
+} from "@/app/contexts/common/pagination";
 
 type FieldConfig<T> = {
   key: keyof T;
@@ -25,6 +38,9 @@ interface DataListProps<T> {
   onSort?: (sortConfig: SortConfig) => void;
   sortConfig?: SortConfig;
   onCreate?: () => void;
+  loading?: boolean;
+  pagination?: PaginationResponse;
+  setPagination?: (pagination: PaginationRequest) => void;
 }
 
 export function DataList<T>({
@@ -36,6 +52,9 @@ export function DataList<T>({
   onSort,
   sortConfig,
   onCreate,
+  loading,
+  pagination,
+  setPagination,
 }: DataListProps<T>) {
   const [currentSort, setCurrentSort] = useState<SortConfig | undefined>(
     sortConfig
@@ -65,9 +84,7 @@ export function DataList<T>({
         >
           {visibleFields.map((field) => (
             <div key={field.key as string} className="flex flex-col gap-1 mb-2">
-              <span className="text-xs text-white/60">
-                {field.label}
-              </span>
+              <span className="text-xs text-white/60">{field.label}</span>
               <div className="font-medium text-sm">
                 {field.render
                   ? field.render(item[field.key], item)
@@ -195,15 +212,47 @@ export function DataList<T>({
           </button>
         </div>
       )}
-      <div className="overflow-x-auto">
-        <div className="hidden md:block">
-          <DesktopView />
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <Loader2 className="w-8 h-8 animate-spin" />
         </div>
-        <div className="md:hidden">
-          <MobileView />
+      ) : (
+        <div className="overflow-x-auto">
+          <div className="hidden md:block">
+            <DesktopView />
+          </div>
+          <div className="md:hidden">
+            <MobileView />
+          </div>
         </div>
-      </div>
-
+      )}
+      {pagination && (
+        <div className="flex justify-end items-center gap-3 pt-4">
+          <button
+            onClick={() => {
+              setPagination?.({ ...pagination, page: pagination.page - 1 })
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            }
+            className="bg-foreground/30 p-2 rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-foreground/50 transition-colors font-bold"
+            disabled={pagination.page === 1}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-white/60">{pagination.page} de {pagination.totalPages}</span>
+          <button
+            onClick={() => {
+              setPagination?.({ ...pagination, page: pagination.page + 1 })
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            }
+            className="bg-foreground/30 p-2 rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:bg-foreground/50 transition-colors font-bold"
+            disabled={pagination.page === pagination.totalPages}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
       <DetailModal
         open={!!selectedItem}
         onClose={() => setSelectedItem(null)}

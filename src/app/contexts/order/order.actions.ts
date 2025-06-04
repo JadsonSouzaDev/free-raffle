@@ -5,6 +5,7 @@ import { neon } from "@neondatabase/serverless";
 import { z } from "zod";
 import { createPayment } from "./payment.actions";
 import { formatTimeRemaining } from "@/app/utils/time";
+import { PaginationRequest } from "../common/pagination";
 
 const MAX_NUMBER = 1000000;
 
@@ -91,15 +92,17 @@ export async function orderPaid(orderId: string) {
         await sql`
           INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id)
           VALUES (${quote}, ${raffleId}, ${orderId}, 'reserved', ${isAwarded})
+
+          UPDATE raffles_awarded_quotes SET user_id = ${order[0].user_id} WHERE id = ${isAwarded}
         `;
       } else {
         await sql`
          INSERT INTO quotas (serial_number, raffle_id, order_id, status)
          VALUES (${quote}, ${raffleId}, ${orderId}, 'reserved')
        `;
-        createdQuotes++;
-        exclude.push(quote);
       }
+      createdQuotes++;
+      exclude.push(quote);
     } else {
       exclude.push(quote);
     }
@@ -188,14 +191,30 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   return ordersWithQuotas;
 }
 
-export async function getOrders() {
+export async function getOrders({ raffleId, userId, pagination } : { raffleId?: string, userId?: string, pagination: PaginationRequest } = {pagination: {page: 1, limit: 10}}) {
   const sql = neon(`${process.env.DATABASE_URL}`);
+
+  const where = sql`
+    WHERE 1=1
+    ${raffleId ? sql`AND o.raffle_id = ${raffleId}` : sql``}
+    ${userId ? sql`AND o.user_id = ${userId}` : sql``}
+  `;
+
+  const countQuery = await sql`
+    SELECT COUNT(*) FROM orders o
+    ${where}
+  `;
+
+  const count = countQuery[0].count;
 
   const orders = await sql`
     SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount, p.gateway
     FROM orders o
     LEFT JOIN payments p ON o.id = p.order_id
+    ${where}
     ORDER BY o.created_at DESC
+    LIMIT ${pagination.limit}
+    OFFSET ${(pagination.page - 1) * pagination.limit}
   `;
 
   const ordersWithQuotas = await Promise.all(
@@ -204,8 +223,13 @@ export async function getOrders() {
       raffleId: order.raffle_id,
       userId: order.user_id,
       quotasQuantity: order.quotas_quantity,
-      status: order.status === "completed" ? order.status : 
-        (new Date().getTime() - new Date(order.created_at).getTime() > 5 * 60 * 1000) ? "expired" : order.status,
+      status:
+        order.status === "completed"
+          ? order.status
+          : new Date().getTime() - new Date(order.created_at).getTime() >
+            5 * 60 * 1000
+          ? "expired"
+          : order.status,
       createdAt: order.created_at,
       payment: order.gateway_qrcode
         ? {
@@ -213,7 +237,7 @@ export async function getOrders() {
             qrCode: order.gateway_qrcode,
             qrCodeBase64: order.gateway_qrcode_base64,
             gateway: order.gateway,
-            type:  "pix",
+            type: "pix",
           }
         : undefined,
       quotas:
@@ -227,5 +251,11 @@ export async function getOrders() {
     }))
   );
 
-  return ordersWithQuotas;
+  return {
+    data: ordersWithQuotas,
+    total: count,
+    page: pagination.page,
+    limit: pagination.limit,
+    totalPages: Math.ceil(count / pagination.limit)
+  }
 }

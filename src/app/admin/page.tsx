@@ -17,7 +17,8 @@ type OrderStatus =
 export default async function AdminPage() {
   // Aqui você pode buscar os dados reais dos sorteios
   const raffles = await getRaffles();
-  const orders = await getOrders();
+  const ordersResponse = await getOrders();
+  const { data: orders, ...ordersPagination } = ordersResponse;
   const users = await getUsers();
 
   return (
@@ -35,16 +36,18 @@ export default async function AdminPage() {
                   description: raffle.description,
                   status: raffle.status,
                   createdAt: raffle.createdAt.toISOString(),
+                  quotasSold: raffle.quotasSold || 0,
                   prices: raffle.prices.map((price) => ({
                     id: price.id,
                     price: price.price,
                     quantity: price.quantity,
                   })),
-                  awardedQuotes: raffle.awardedQuotes?.map((quote) => ({
-                    id: quote.id,
-                    referenceNumber: quote.referenceNumber,
-                    gift: quote.gift,
-                  })) || [],
+                  awardedQuotes:
+                    raffle.awardedQuotes?.map((quote) => ({
+                      id: quote.id,
+                      referenceNumber: quote.referenceNumber,
+                      gift: quote.gift,
+                    })) || [],
                 }))}
               />
             </div>
@@ -83,6 +86,7 @@ export default async function AdminPage() {
                     quotas: order.quotas,
                   })
                 )}
+                initialPagination={ordersPagination}
               />
             </div>
           ),
