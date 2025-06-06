@@ -394,3 +394,40 @@ export async function updateRaffle(raffleId: string, formData: UpdateRaffleFormD
     }
   }
 }
+
+export async function drawRaffle(raffleId: string, number: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  // get raffle
+  const raffleResult = await sql`SELECT id FROM raffles WHERE id = ${raffleId} AND active = true limit 1` as RaffleData[];
+
+  if (raffleResult.length === 0) {
+    throw new Error("Raffle not found");
+  }
+
+  if (raffleResult[0].winner_quota_id) {
+    throw new Error("Raffle is not active");
+  }
+
+  // get quotas
+  const quota = await sql`SELECT q.id, u.whatsapp, u.name 
+    FROM quotas q 
+    join orders o on q.order_id = o.id 
+    join users u on o.user_id = u.whatsapp 
+    WHERE q.raffle_id = ${raffleId} AND q.serial_number = ${number} limit 1`;
+
+  if (quota.length === 0) {
+    throw new Error("Quota not found");
+  }
+
+  // update raffle
+  await sql`UPDATE raffles SET winner_quota_id = ${quota[0].id} WHERE id = ${raffleId}`;
+
+  const quotaData = quota[0] as unknown as {
+    id: string;
+    whatsapp: string;
+    name: string;
+  };
+
+  return quotaData;
+}

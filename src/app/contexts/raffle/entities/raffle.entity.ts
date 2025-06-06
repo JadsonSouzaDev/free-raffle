@@ -7,7 +7,7 @@ export type RaffleData = {
   title: string;
   images_urls: string[];
   description: string;
-  main_winner_id?: string;
+  winner_quota_id?: string;
   active: boolean;
   hidden: boolean;
   created_at: Date;
@@ -19,7 +19,7 @@ export class Raffle {
   title!: string;
   imagesUrls!: string[];
   description!: string;
-  mainWinnerId?: string;
+  winnerQuotaId?: string;
   active!: boolean;
   hidden!: boolean;
   createdAt!: Date;
@@ -42,7 +42,7 @@ export class Raffle {
     this.hidden = data.hidden;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
-    this.mainWinnerId = data.main_winner_id;
+    this.winnerQuotaId = data.winner_quota_id;
     this.quotasSold = 0;
   }
 
@@ -83,7 +83,7 @@ export class Raffle {
   }
 
   get status(): "active" | "finished" {
-    if (this.mainWinnerId) {
+    if (this.winnerQuotaId) {
       return "finished";
     }
     return "active";

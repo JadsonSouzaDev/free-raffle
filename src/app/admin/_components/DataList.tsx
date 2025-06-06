@@ -41,6 +41,13 @@ interface DataListProps<T> {
   loading?: boolean;
   pagination?: PaginationResponse;
   setPagination?: (pagination: PaginationRequest) => void;
+  customActions?: {
+    icon: React.ReactNode;
+    label: string;
+    onClick: (item: T) => void;
+    condition?: (item: T) => boolean;
+    className?: string;
+  }[];
 }
 
 export function DataList<T>({
@@ -55,6 +62,7 @@ export function DataList<T>({
   loading,
   pagination,
   setPagination,
+  customActions,
 }: DataListProps<T>) {
   const [currentSort, setCurrentSort] = useState<SortConfig | undefined>(
     sortConfig
@@ -119,6 +127,19 @@ export function DataList<T>({
                   <span className="text-xs">Excluir</span>
                 </button>
               )}
+              {customActions?.map((action, index) => {
+                if (action.condition && !action.condition(item)) return null;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => action.onClick(item)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-white ${action.className ?? "bg-foreground hover:bg-foreground/90"}`}
+                  >
+                    {action.icon}
+                    <span className="text-xs">{action.label}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -191,6 +212,18 @@ export function DataList<T>({
                       <Trash className="w-4 h-4" />
                     </button>
                   )}
+                  {customActions?.map((action, index) => {
+                    if (action.condition && !action.condition(item)) return null;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => action.onClick(item)}
+                        className={`cursor-pointer p-1 rounded-lg transition-colors ${action.className ?? "text-white hover:bg-white/10"}`}
+                      >
+                        {action.icon}
+                      </button>
+                    );
+                  })}
                 </div>
               </td>
             )}

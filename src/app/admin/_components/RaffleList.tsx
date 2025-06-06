@@ -8,6 +8,8 @@ import CopyText from "./CopyText";
 import { useState } from "react";
 import EditRaffleModal from "./EditRaffleModal";
 import CreateRaffleModal from "./CreateRaffleModal";
+import { Gift } from "lucide-react";
+import { DrawModal } from "./DrawModal";
 
 type RaffleListProps = {
   raffles: {
@@ -32,13 +34,32 @@ type RaffleListProps = {
 
 const statusColors = {
   active: "bg-green-500 text-white",
-  finished: "bg-red-500 text-white",
+  finished: "bg-yellow-500 text-white",
 };
 
 export function RaffleList({ raffles }: RaffleListProps) {
   const [isCreateRaffleModalOpen, setIsCreateRaffleModalOpen] = useState(false);
   const [isEditRaffleModalOpen, setIsEditRaffleModalOpen] = useState(false);
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
+  const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
+
+  const handleDraw = async (number: string) => {
+    if (!selectedRaffle) return;
+
+    try {
+      // TODO: Implementar a chamada para realizar o sorteio
+      console.log("Realizando sorteio", {
+        raffleId: selectedRaffle.id,
+        number,
+      });
+      
+      setIsDrawModalOpen(false);
+      setSelectedRaffle(null);
+    } catch (error) {
+      console.error("Erro ao realizar sorteio:", error);
+      alert("Erro ao realizar o sorteio. Tente novamente.");
+    }
+  };
 
   return (
     <>
@@ -156,6 +177,18 @@ export function RaffleList({ raffles }: RaffleListProps) {
         onCreate={() => {
           setIsCreateRaffleModalOpen(true);
         }}
+        customActions={[
+          {
+            icon: <Gift className="w-4 h-4" />,
+            label: "Sortear",
+            onClick: (raffle) => {
+              setSelectedRaffle(raffle as unknown as Raffle);
+              setIsDrawModalOpen(true);
+            },
+            condition: (raffle) => raffle.status === "active",
+            className: "bg-yellow-500 hover:text-yellow-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
+          },
+        ]}
       />
       <EditRaffleModal
         raffleId={selectedRaffle?.id ?? ""}
@@ -165,6 +198,15 @@ export function RaffleList({ raffles }: RaffleListProps) {
       <CreateRaffleModal
         open={isCreateRaffleModalOpen}
         onClose={() => setIsCreateRaffleModalOpen(false)}
+      />
+      <DrawModal
+        isOpen={isDrawModalOpen}
+        onClose={() => {
+          setIsDrawModalOpen(false);
+          setSelectedRaffle(null);
+        }}
+        onDraw={handleDraw}
+        raffleId={selectedRaffle?.id ?? ""}
       />
     </>
   );
