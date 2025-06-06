@@ -206,7 +206,7 @@ export function DataList<T>({
         <div className="mb-4">
           <button
             onClick={onCreate}
-            className="flex items-center gap-2 px-4 py-2 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white font-medium"
+            className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white font-medium"
           >
             <span className="text-sm">Criar Novo</span>
           </button>

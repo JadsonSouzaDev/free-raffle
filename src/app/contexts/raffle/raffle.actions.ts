@@ -16,16 +16,17 @@ import { getEndOfDay, getStartOfDay, getStartOfWeek } from "@/app/utils/date";
 import { getEndOfWeek } from "@/app/utils/date";
 import { RaffleHighestQuota, RaffleHighestQuotaData } from "./entities/raffle-highest-quota.entity";
 import { RaffleLowestQuota, RaffleLowestQuotaData } from "./entities/raffle-lowest-quota.entity";
+import { CreateRaffleFormData } from "@/app/admin/_components/CreateRaffleModal";
 
-export async function createRaffle(formData: FormData) {
+export async function createRaffle(formData: CreateRaffleFormData) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   // create raffle
-  const title = formData.get("title");
-  const images_urls = formData.get("images_urls");
-  const description = formData.get("description");
+  const title = formData.title
+  const images_urls = formData.imagesUrls.join(",");
+  const description = formData.description;
   const result =
-    (await sql`INSERT INTO raffles (title, images_urls, description) VALUES (${title}, ${images_urls}, ${description}) RETURNING id`) as unknown as {
+    (await sql`INSERT INTO raffles (title, images_urls, description) VALUES (${title}, ARRAY[${images_urls}], ${description}) RETURNING id`) as unknown as {
       id: string;
     }[];
   const raffle_id = result[0].id;
@@ -34,20 +35,15 @@ export async function createRaffle(formData: FormData) {
   await sql`INSERT INTO raffles_flags (id) VALUES (${raffle_id})`;
 
   // create prices
-  const prices = JSON.parse(formData.get("prices") as unknown as string) as {
-    price: number;
-    quantity: number;
-  }[];
+  const prices = formData.prices;
   for (const price of prices) {
-    await sql`INSERT INTO raffles_prices (raffle_id, price, quantity) VALUES (${raffle_id}, ${price.price}, ${price.quantity})`;
+    await sql`INSERT INTO raffles_prices (raffle_id, price, quantity) VALUES (${raffle_id}, ${price.pricePerUnit}, ${price.quantity})`;
   }
   // create awarded quotes
-  const awarded_quotes = formData.get("awarded_quotes") as unknown as {
-    reference_number: number;
-  }[];
+  const awarded_quotes = formData.awardedNumbers;
   if (awarded_quotes) {
     for (const awarded_quote of awarded_quotes) {
-      await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number) VALUES (${raffle_id}, ${awarded_quote.reference_number})`;
+      await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number, gift) VALUES (${raffle_id}, ${awarded_quote.reference_number}, ${awarded_quote.award})`;
     }
   }
 }

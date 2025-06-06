@@ -14,8 +14,7 @@ const statusColors = {
 };
 
 export default async function Home() {
-  const rawRaffles = await getRaffles();
-  const raffles = [...rawRaffles, ...rawRaffles, ...rawRaffles];
+  const raffles = await getRaffles();
 
   return (
     <div className="flex flex-col gap-4">

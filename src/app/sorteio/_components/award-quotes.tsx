@@ -38,7 +38,7 @@ const AwardQuotes = ({ awardedQuotes }: AwardQuotesProps) => {
           {awardedQuotes?.map((quote) => (
             <div
               key={quote.id}
-              className={`grid grid-cols-3 w-full py-2 px-3 rounded-lg text-sm text-white ${!quote.user ? 'bg-foreground/50' : 'bg-red-700'}`}
+              className={`grid grid-cols-3 w-full py-2 px-3 rounded-lg text-sm text-white ${!quote.user ? 'bg-foreground/50' : 'bg-red-700'} items-center`}
             >
               <span className={`flex w-[70px] items-center justify-center px-2 py-1 rounded-lg font-bold ${!quote.user ? 'text-white bg-white/40 ' : 'bg-white text-foreground'}`}>{quote.referenceNumber.toString().padStart(6, '0')}</span>
               <span className="font-normal text-center">{quote.gift}</span>

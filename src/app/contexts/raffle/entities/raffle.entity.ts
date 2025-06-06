@@ -34,7 +34,7 @@ export class Raffle {
   constructor(data: RaffleData) {
     this.id = data.id;
     this.title = data.title;
-    this.imagesUrls = data.images_urls;
+    this.imagesUrls = data.images_urls[0].split(",");
     this.description = data.description;
     this.active = data.active;
     this.createdAt = data.created_at;

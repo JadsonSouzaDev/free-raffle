@@ -7,6 +7,7 @@ import { Raffle, RaffleAwardQuotes } from "@/app/contexts/raffle/entities";
 import CopyText from "./CopyText";
 import { useState } from "react";
 import EditRaffleModal from "./EditRaffleModal";
+import CreateRaffleModal from "./CreateRaffleModal";
 
 type RaffleListProps = {
   raffles: {
@@ -35,6 +36,7 @@ const statusColors = {
 };
 
 export function RaffleList({ raffles }: RaffleListProps) {
+  const [isCreateRaffleModalOpen, setIsCreateRaffleModalOpen] = useState(false);
   const [isEditRaffleModalOpen, setIsEditRaffleModalOpen] = useState(false);
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
 
@@ -151,11 +153,18 @@ export function RaffleList({ raffles }: RaffleListProps) {
         onDelete={(raffle) => {
           console.log("Deletar", raffle);
         }}
+        onCreate={() => {
+          setIsCreateRaffleModalOpen(true);
+        }}
       />
       <EditRaffleModal
         raffleId={selectedRaffle?.id ?? ""}
         isOpen={isEditRaffleModalOpen}
         onClose={() => setIsEditRaffleModalOpen(false)}
+      />
+      <CreateRaffleModal
+        open={isCreateRaffleModalOpen}
+        onClose={() => setIsCreateRaffleModalOpen(false)}
       />
     </>
   );

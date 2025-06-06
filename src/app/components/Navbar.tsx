@@ -22,9 +22,7 @@ export function Navbar() {
       }
 
       try {
-        const secret = new TextEncoder().encode(
-          process.env.NEXT_PUBLIC_JWT_SECRET || "default_secret"
-        );
+        const secret = new TextEncoder().encode("c4r4d3b0n3");
 
         const { payload } = await jose.jwtVerify(token as string, secret);
         const roles = payload.roles as string[] | undefined;
