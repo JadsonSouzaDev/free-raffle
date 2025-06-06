@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS raffles (
   images_urls TEXT[],
   description TEXT NOT NULL,
   active BOOLEAN DEFAULT true,
+  hidden BOOLEAN DEFAULT false,
   winner_quota_id UUID REFERENCES quotas(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

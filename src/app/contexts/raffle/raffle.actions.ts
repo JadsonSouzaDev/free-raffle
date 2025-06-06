@@ -18,6 +18,70 @@ import { RaffleHighestQuota, RaffleHighestQuotaData } from "./entities/raffle-hi
 import { RaffleLowestQuota, RaffleLowestQuotaData } from "./entities/raffle-lowest-quota.entity";
 import { CreateRaffleFormData } from "@/app/admin/_components/CreateRaffleModal";
 
+export type RaffleResponse = {
+  id: string;
+  title: string;
+  description: string;
+  imagesUrls: string[];
+  prices: Array<{
+    id: string;
+    price: number;
+    quantity: number;
+    createdAt: Date;
+    updatedAt: Date;
+    active: boolean;
+  }>;
+  awardedQuotes: Array<{
+    id: string;
+    referenceNumber: number;
+    gift: string;
+    user?: {
+      whatsapp: string;
+      name: string;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+    active: boolean;
+  }>;
+  topBuyers: Array<{
+    whatsapp: string;
+    name: string;
+    total: number;
+  }>;
+  topBuyersWeek: Array<{
+    whatsapp: string;
+    name: string;
+    total: number;
+  }>;
+  topBuyersDay: Array<{
+    whatsapp: string;
+    name: string;
+    total: number;
+  }>;
+  highestQuota?: {
+    whatsapp: string;
+    name: string;
+    referenceNumber: number;
+  };
+  lowestQuota?: {
+    whatsapp: string;
+    name: string;
+    referenceNumber: number;
+  };
+  flags: {
+    flagTopBuyers: boolean;
+    flagTopBuyersWeek: boolean;
+    flagTopBuyersDay: boolean;
+    flagLowestQuota: boolean;
+    flagHighestQuota: boolean;
+  };
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  active: boolean;
+  quotasSold: number;
+}
+
 export async function createRaffle(formData: CreateRaffleFormData) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
@@ -91,6 +155,71 @@ export async function getRaffles(): Promise<Raffle[]> {
   }
 
   return raffles;
+}
+
+export async function getRaffleById(id: string): Promise<RaffleResponse>{
+  const raffle = await getRaffle(id);
+  return {
+    id: raffle.id,
+    title: raffle.title,
+    description: raffle.description,
+    imagesUrls: raffle.imagesUrls,
+    prices: raffle.prices.map(price => ({
+      id: price.id,
+      price: price.price,
+      quantity: price.quantity,
+      createdAt: price.createdAt,
+      updatedAt: price.updatedAt,
+      active: price.active,
+    })),
+    awardedQuotes: (raffle.awardedQuotes ?? []).map(quote => ({
+      id: quote.id,
+      referenceNumber: quote.referenceNumber,
+      gift: quote.gift,
+      userId: quote.user?.whatsapp,
+      userName: quote.user?.name,
+      createdAt: quote.createdAt,
+      updatedAt: quote.updatedAt,
+      active: quote.active,
+    })),
+    topBuyers: (raffle.topBuyers ?? []).map(buyer => ({
+      whatsapp: buyer.whatsapp,
+      name: buyer.name,
+      total: buyer.total,
+    })),
+    topBuyersWeek: (raffle.topBuyersWeek ?? []).map(buyer => ({
+      whatsapp: buyer.whatsapp,
+      name: buyer.name,
+      total: buyer.total,
+    })),
+    topBuyersDay: (raffle.topBuyersDay ?? []).map(buyer => ({
+      whatsapp: buyer.whatsapp,
+      name: buyer.name,
+      total: buyer.total,
+    })),
+    highestQuota: raffle.highestQuota ? {
+      whatsapp: raffle.highestQuota.whatsapp,
+      name: raffle.highestQuota.name,
+      referenceNumber: raffle.highestQuota.referenceNumber,
+    } : undefined,
+    lowestQuota: raffle.lowestQuota ? {
+      whatsapp: raffle.lowestQuota.whatsapp,
+      name: raffle.lowestQuota.name,
+      referenceNumber: raffle.lowestQuota.referenceNumber,
+    } : undefined,
+    flags: {
+      flagTopBuyers: raffle.flags.flagTopBuyers,
+      flagTopBuyersWeek: raffle.flags.flagTopBuyersWeek,
+      flagTopBuyersDay: raffle.flags.flagTopBuyersDay,
+      flagLowestQuota: raffle.flags.flagLowestQuota,
+      flagHighestQuota: raffle.flags.flagHighestQuota,
+    },
+    status: raffle.status,
+    createdAt: raffle.createdAt,
+    updatedAt: raffle.updatedAt,
+    active: raffle.active,
+    quotasSold: raffle.quotasSold ?? 0,
+  }
 }
 
 export async function getRaffle(id: string): Promise<Raffle> {
@@ -197,4 +326,71 @@ export async function getRafflesSelectOptions(): Promise<
   const rawRaffles =
     await sql`SELECT id, title FROM raffles WHERE active = true ORDER BY created_at DESC`;
   return rawRaffles.map((raffle) => ({ id: raffle.id, title: raffle.title }));
+}
+
+export type UpdateRaffleFormData = Omit<CreateRaffleFormData, 'prices' | 'awardedNumbers'> & {
+  prices: Array<{
+    id?: string;
+    quantity: number;
+    pricePerUnit: number;
+  }>;
+  awardedNumbers: Array<{
+    id?: string;
+    reference_number: number;
+    award: string;
+  }>;
+};
+
+export async function updateRaffle(raffleId: string, formData: UpdateRaffleFormData) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  // update raffle
+  const title = formData.title;
+  const images_urls = formData.imagesUrls.join(",");
+  const description = formData.description;
+  await sql`UPDATE raffles SET title = ${title}, images_urls = ARRAY[${images_urls}], description = ${description} WHERE id = ${raffleId}`;
+
+  // get existing prices and awarded quotes
+  const existingPrices = await sql`SELECT id, quantity FROM raffles_prices WHERE raffle_id = ${raffleId} AND active = true`;
+  const existingAwardedQuotes = await sql`SELECT id, reference_number FROM raffles_awarded_quotes WHERE raffle_id = ${raffleId} AND active = true`;
+
+  // update prices
+  const prices = formData.prices;
+  const existingPriceIds = existingPrices.map(p => p.id);
+  const newPriceIds = prices.filter(p => p.id).map(p => p.id as string);
+  
+  // Desativa preços que não estão mais presentes no formData
+  const pricesToDeactivate = existingPriceIds.filter(id => !newPriceIds.includes(id));
+  if (pricesToDeactivate.length > 0) {
+    await sql`UPDATE raffles_prices SET active = false WHERE raffle_id = ${raffleId} AND id = ANY(${pricesToDeactivate})`;
+  }
+  
+  // Atualiza ou cria novos preços
+  for (const price of prices) {
+    if (price.id) {
+      await sql`UPDATE raffles_prices SET quantity = ${price.quantity}, price = ${price.pricePerUnit} WHERE id = ${price.id}`;
+    } else {
+      await sql`INSERT INTO raffles_prices (raffle_id, price, quantity) VALUES (${raffleId}, ${price.pricePerUnit}, ${price.quantity})`;
+    }
+  }
+
+  // update awarded quotes
+  const awardedQuotes = formData.awardedNumbers;
+  const existingAwardedQuoteIds = existingAwardedQuotes.map(q => q.id);
+  const newAwardedQuoteIds = awardedQuotes.filter(q => q.id).map(q => q.id as string);
+
+  // Desativa cotas premiadas que não estão mais presentes no formData
+  const quotesToDeactivate = existingAwardedQuoteIds.filter(id => !newAwardedQuoteIds.includes(id));
+  if (quotesToDeactivate.length > 0) {
+    await sql`UPDATE raffles_awarded_quotes SET active = false WHERE raffle_id = ${raffleId} AND id = ANY(${quotesToDeactivate})`;
+  }
+
+  // Atualiza ou cria novas cotas premiadas
+  for (const quote of awardedQuotes) {
+    if (quote.id) {
+      await sql`UPDATE raffles_awarded_quotes SET reference_number = ${quote.reference_number}, gift = ${quote.award} WHERE id = ${quote.id}`;
+    } else {
+      await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number, gift) VALUES (${raffleId}, ${quote.reference_number}, ${quote.award})`;
+    }
+  }
 }

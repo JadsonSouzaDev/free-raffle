@@ -17,13 +17,13 @@ const createRaffleSchema = z.object({
     quantity: z.number({
       required_error: "A quantidade é obrigatória",
       invalid_type_error: "A quantidade deve ser um número",
-    }).min(2, "A quantidade deve ser maior que 1"),
+    }).min(1, "A quantidade deve ser maior que 1"),
     pricePerUnit: z.number({
       required_error: "O preço é obrigatório",
       invalid_type_error: "O preço deve ser um número",
     }).min(0.01, "O preço deve ser maior que 0"),
   }))
-  .min(1, "Adicione pelo menos um preço")
+  .min(2, "Adicione pelo menos dois preços")
   .refine(
     (prices) => {
       // Verifica se existem quantidades duplicadas

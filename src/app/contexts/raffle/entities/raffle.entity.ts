@@ -9,6 +9,7 @@ export type RaffleData = {
   description: string;
   main_winner_id?: string;
   active: boolean;
+  hidden: boolean;
   created_at: Date;
   updated_at: Date;
 };
@@ -20,6 +21,7 @@ export class Raffle {
   description!: string;
   mainWinnerId?: string;
   active!: boolean;
+  hidden!: boolean;
   createdAt!: Date;
   updatedAt!: Date;
   prices!: RafflePrice[];
@@ -37,6 +39,7 @@ export class Raffle {
     this.imagesUrls = data.images_urls[0].split(",");
     this.description = data.description;
     this.active = data.active;
+    this.hidden = data.hidden;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
     this.mainWinnerId = data.main_winner_id;
