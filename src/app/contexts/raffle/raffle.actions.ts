@@ -431,3 +431,25 @@ export async function drawRaffle(raffleId: string, number: string) {
 
   return quotaData;
 }
+
+export async function getRaffleWinner(raffleId: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  // get raffle
+  const raffleResult = await sql`SELECT q.serial_number, u.whatsapp, u.name 
+    FROM quotas q 
+    join raffles r on q.raffle_id = r.id
+    join orders o on q.order_id = o.id 
+    join users u on o.user_id = u.whatsapp 
+    WHERE r.id = ${raffleId} AND r.winner_quota_id = q.id limit 1` as {
+      serial_number: string;
+      whatsapp: string;
+      name: string;
+    }[];
+
+  if (raffleResult.length === 0) {
+    throw new Error("Raffle not found");
+  }
+
+  return raffleResult[0];
+}

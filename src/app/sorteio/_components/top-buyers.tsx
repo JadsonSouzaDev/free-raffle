@@ -77,7 +77,7 @@ const TopBuyers = ({
               <span className="text-sm w-full">{buyer.name}</span>
               <span className="font-bold text-sm">
                 {isReferenceNumber
-                  ? buyer.referenceNumber
+                  ? buyer?.referenceNumber?.toString().padStart(6, "0")
                   : `${buyer.quantity} cota${buyer.quantity > 1 ? "s" : ""}`}
               </span>
             </div>
