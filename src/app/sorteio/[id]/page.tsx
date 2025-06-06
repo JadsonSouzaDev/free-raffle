@@ -1,11 +1,11 @@
 import { getRaffle } from "@/app/contexts/raffle/raffle.actions";
 import { formatCurrency } from "@/app/utils/currency";
-import Image from "next/image";
 import QuantitySelector from "../_components/quantity-selector";
 import TopBuyers from "../_components/top-buyers";
 import AwardQuotes from "../_components/award-quotes";
 import { Gift, Info } from "lucide-react";
 import { getEndOfDay, getEndOfWeek, getStartOfDay, getStartOfWeek } from "@/app/utils/date";
+import { ImageCarousel } from "@/app/components/ImageCarousel";
 
 interface SorteioPageProps {
   params: Promise<{
@@ -28,17 +28,9 @@ async function SorteioPage({ params }: SorteioPageProps) {
         className="flex flex-col gap-4 py-3 md:p-4 text-white"
       >
         <div className="flex flex-col justify-center">
-          <div className="relative w-full h-[230px] md:h-[320px] rounded-xl overflow-hidden shadow-lg">
-            {raffle.imagesUrls[0] && (
-              <Image
-                src={raffle.imagesUrls[0]}
-                alt={raffle.title}
-                fill
-                priority
-                className="rounded-sm object-cover"
-              />
-            )}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r  from-foreground to-foreground/60 text-white py-2 px-2">
+          <div className="relative w-full rounded-xl overflow-hidden shadow-lg">
+            <ImageCarousel images={raffle.imagesUrls} title={raffle.title} />
+            <div className="relative -mt-12 bg-gradient-to-r from-foreground to-foreground/60 text-white py-2 px-2">
               <h1 className="text-xl md:text-2xl font-bold">{raffle.title}</h1>
             </div>
           </div>

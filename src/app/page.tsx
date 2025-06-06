@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getRaffles } from "./contexts/raffle/raffle.actions";
 import Image from "next/image";
 import { Gift } from "lucide-react";
+import { ImageCarousel } from "./components/ImageCarousel";
 
 const statuses = {
   active: "Compre já!",
@@ -28,21 +29,11 @@ export default async function Home() {
             <Link key={`${raffle.id}-${index}`} href={`/sorteio/${raffle.id}`}>
               <div className="flex flex-col gap-2 p-3 md:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-white">
                 <div className="flex flex-col justify-center">
-                  <div className="relative w-full h-[230px] md:h-[320px]">
-                    {raffle.imagesUrls[0] && (
-                      <Image
-                        src={raffle.imagesUrls[0]}
-                        alt={raffle.title}
-                        fill
-                        priority
-                        className="rounded-sm object-cover"
-                      />
-                    )}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r  from-foreground to-foreground/60 text-white py-2 px-2">
-                      <h1 className="text-xl md:text-2xl font-bold">
-                        {raffle.title}
-                      </h1>
-                    </div>
+                  <ImageCarousel images={raffle.imagesUrls} title={raffle.title} />
+                  <div className="relative -mt-12 bg-gradient-to-r from-foreground to-foreground/60 text-white py-2 px-2">
+                    <h1 className="text-xl md:text-2xl font-bold">
+                      {raffle.title}
+                    </h1>
                   </div>
                 </div>
                 <p className="text-sm opacity-90 line-clamp-1 md:line-clamp-none">
