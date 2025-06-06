@@ -28,7 +28,7 @@ export default async function Home() {
           return (
             <Link key={`${raffle.id}-${index}`} href={`/sorteio/${raffle.id}`}>
               <div className="flex flex-col gap-2 p-3 md:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-white">
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center rounded-xl overflow-hidden">
                   <ImageCarousel images={raffle.imagesUrls} title={raffle.title} />
                   <div className="relative -mt-12 bg-gradient-to-r from-foreground to-foreground/60 text-white py-2 px-2">
                     <h1 className="text-xl md:text-2xl font-bold">
