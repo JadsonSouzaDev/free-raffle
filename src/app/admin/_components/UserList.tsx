@@ -11,13 +11,17 @@ import { useEffect, useState } from "react";
 import { getUsers } from "@/app/contexts/user/user.actions";
 import useSWR from "swr";
 import SearchText from "./SearchText";
+import { Camera } from "lucide-react";
+import { UserPhotoModal } from "./UserPhotoModal";
 
 interface User {
+  id: string;
   whatsapp: string;
   name: string;
   roles: string[];
   createdAt: string;
   updatedAt: string;
+  imgUrl?: string;
 }
 
 const roleMap = {
@@ -38,6 +42,7 @@ export function UserList({
     useState<PaginationRequest>(DEFAULT_PAGINATION);
   const [paginationResponse, setPaginationResponse] =
     useState<PaginationResponse>(initialPagination);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const { data: usersData, isLoading: isLoadingUsers } = useSWR(
     `/api/users?search=${search}&page=${pagination.page}&limit=${pagination.limit}`,
@@ -68,6 +73,14 @@ export function UserList({
         pagination={paginationResponse}
         setPagination={setPagination}
         loading={isLoadingUsers}
+        customActions={[
+          {
+            icon: <Camera className="w-4 h-4" />,
+            label: "Editar foto",
+            onClick: (user) => setSelectedUser(user),
+            className: "hover:bg-white/10 bg-foreground/70 text-white md:bg-transparent md:hover:bg-white/10"
+          }
+        ]}
         fields={[
           {
             key: "name",
@@ -109,15 +122,18 @@ export function UserList({
             ),
           },
         ]}
-        onEdit={(user) => {
-          console.log("Editar usuário", user);
-        }}
         onDelete={(user) => {
           console.log("Deletar usuário", user);
         }}
         onDeleteCondition={(user) => {
           return !user.roles.includes("admin");
         }}
+      />
+
+      <UserPhotoModal
+        isOpen={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+        user={selectedUser}
       />
     </>
   );

@@ -16,6 +16,13 @@ export function FileUpload({ path, onUploadComplete }: FileUploadProps) {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Verifica se o arquivo é menor que 1MB (1MB = 1024 * 1024 bytes)
+    if (file.size > 1024 * 1024) {
+      setError('O arquivo deve ser menor que 1MB');
+      event.target.value = '';
+      return;
+    }
+
     try {
       setIsUploading(true);
       setError(null);

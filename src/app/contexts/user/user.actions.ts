@@ -101,7 +101,8 @@ export async function getUsers({ search, pagination }: { search?: string, pagina
     name: user.name,
     roles: user.roles,
     createdAt: user.createdAt,
-    updatedAt: user.updatedAt
+    updatedAt: user.updatedAt,
+    imgUrl: user.imgUrl
   }));
 
   return {
@@ -167,4 +168,10 @@ export async function getWinners() {
     raffleImagesUrls: winner.images_urls,
     raffleTitle: winner.title
   }));
+}
+
+
+export async function updateUserPhoto(userId: string, photoUrl: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  await sql`UPDATE users SET img_url = ${photoUrl} WHERE whatsapp = ${userId} AND active = true`;
 }

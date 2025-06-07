@@ -6,7 +6,6 @@ import { formatDate } from "../utils/data";
 
 const Winners = async () => {
   const winners = await getWinners();
-  console.log(winners);
 
   return (
     <div className="flex flex-col gap-4 pt-4">
@@ -28,7 +27,7 @@ const Winners = async () => {
                 alt={winner.userName}
                 width={100}
                 height={100}
-                className="w-full h-full object-cover"
+                className="max-h-[50px] max-w-[50px] min-h-[50px] min-w-[50px] md:min-h-[70px] md:min-w-[70px] md:max-h-[70px] md:max-w-[70px] object-cover"
               />
             )}
             {!winner.userImageUrl && <User className="w-full h-full text-gray-300" />}

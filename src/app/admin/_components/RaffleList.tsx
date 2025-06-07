@@ -43,24 +43,6 @@ export function RaffleList({ raffles }: RaffleListProps) {
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
 
-  const handleDraw = async (number: string) => {
-    if (!selectedRaffle) return;
-
-    try {
-      // TODO: Implementar a chamada para realizar o sorteio
-      console.log("Realizando sorteio", {
-        raffleId: selectedRaffle.id,
-        number,
-      });
-      
-      setIsDrawModalOpen(false);
-      setSelectedRaffle(null);
-    } catch (error) {
-      console.error("Erro ao realizar sorteio:", error);
-      alert("Erro ao realizar o sorteio. Tente novamente.");
-    }
-  };
-
   return (
     <>
       <DataList<RaffleListProps["raffles"][number]>
@@ -207,7 +189,9 @@ export function RaffleList({ raffles }: RaffleListProps) {
           setIsDrawModalOpen(false);
           setSelectedRaffle(null);
         }}
-        onDraw={handleDraw}
+        onDraw={() => {
+          window.location.reload();
+        }}
         raffleId={selectedRaffle?.id ?? ""}
       />
     </>
