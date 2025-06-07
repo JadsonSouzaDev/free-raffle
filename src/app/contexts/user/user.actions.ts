@@ -150,3 +150,21 @@ export async function getUsersSelectOptions({search}: {search?: string} = {}) {
     name: user.name
   }));
 }
+
+export async function getWinners() {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  const mainWinners = await sql`SELECT u.img_url, u.name, q.serial_number, q.updated_at, r.images_urls, r.title FROM raffles as r 
+    INNER JOIN quotas as q ON r.winner_quota_id = q.id 
+    INNER JOIN orders as o ON q.order_id = o.id
+    INNER JOIN users as u ON o.user_id = u.whatsapp
+    WHERE r.winner_quota_id IS NOT NULL ORDER BY r.updated_at DESC LIMIT 10`;
+
+  return mainWinners.map((winner) => ({
+    userImageUrl: winner.img_url,
+    userName: winner.name,
+    serialNumber: winner.serial_number,
+    updatedAt: winner.updated_at,
+    raffleImagesUrls: winner.images_urls,
+    raffleTitle: winner.title
+  }));
+}

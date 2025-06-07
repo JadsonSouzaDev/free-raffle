@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import WhatsappModal from "./_components/whatsapp-modal";
 import { getOrdersByUser } from "../contexts/order/order.actions";
-import { formatDate } from "../utils/data";
+import { formatDateAndTime } from "../utils/data";
 import { ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -161,7 +161,7 @@ function PedidosContent() {
                 <span className="font-bold">Pedido #{order.id.slice(-12)}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-sm opacity-70">
-                    {formatDate(order.createdAt)}
+                    {formatDateAndTime(order.createdAt)}
                   </span>
                   {["pending", "waiting_payment", "completed"].includes(
                     order.status

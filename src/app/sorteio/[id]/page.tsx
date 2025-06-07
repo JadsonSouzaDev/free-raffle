@@ -186,7 +186,7 @@ async function SorteioPage({ params }: SorteioPageProps) {
       )}
       {raffle.status === "finished" && (
         <TopBuyers
-          title="Vencedor"
+          title="Ganhador"
           isReferenceNumber
           topBuyers={winner ? [{
             id: winner.whatsapp,

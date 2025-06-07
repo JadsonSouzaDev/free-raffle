@@ -3,6 +3,7 @@ import { getRaffles } from "./contexts/raffle/raffle.actions";
 import Image from "next/image";
 import { Gift } from "lucide-react";
 import { ImageCarousel } from "./components/ImageCarousel";
+import Winners from "./components/Winners";
 
 const statuses = {
   active: "Compre já!",
@@ -85,6 +86,8 @@ export default async function Home() {
           </Link>
         );
       })}
+
+      <Winners />
     </div>
   );
 }

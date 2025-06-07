@@ -1,7 +1,7 @@
 "use client";
 
 import { formatCurrency } from "@/app/utils/currency";
-import { formatDate } from "@/app/utils/data";
+import { formatDateAndTime } from "@/app/utils/data";
 import { DataList } from "./DataList";
 import CopyText from "./CopyText";
 import { useEffect, useState } from "react";
@@ -147,7 +147,7 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
             key: "createdAt",
             label: "Data",
             render: (value) => (
-              <span className="">{formatDate(value as string)}</span>
+              <span className="">{formatDateAndTime(value as string)}</span>
             ),
           },
           {

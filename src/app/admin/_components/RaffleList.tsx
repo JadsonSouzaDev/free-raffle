@@ -1,7 +1,7 @@
 "use client";
 
 import { formatCurrency } from "@/app/utils/currency";
-import { formatDate } from "@/app/utils/data";
+import { formatDateAndTime } from "@/app/utils/data";
 import { DataList } from "./DataList";
 import { Raffle, RaffleAwardQuotes } from "@/app/contexts/raffle/entities";
 import CopyText from "./CopyText";
@@ -164,9 +164,10 @@ export function RaffleList({ raffles }: RaffleListProps) {
             key: "createdAt",
             label: "Data de criação",
             onlyDetail: true,
-            render: (value) => formatDate(value as string),
+            render: (value) => formatDateAndTime(value as string),
           },
         ]}
+        onEditCondition={(raffle) => raffle.status === "active"}
         onEdit={(raffle) => {
           setSelectedRaffle(raffle as unknown as Raffle);
           setIsEditRaffleModalOpen(true);
@@ -185,7 +186,8 @@ export function RaffleList({ raffles }: RaffleListProps) {
               setSelectedRaffle(raffle as unknown as Raffle);
               setIsDrawModalOpen(true);
             },
-            condition: (raffle) => raffle.status === "active",
+            condition: (raffle) =>
+              raffle.status === "active" && raffle.quotasSold > 0,
             className: "bg-yellow-500 hover:text-yellow-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
           },
         ]}

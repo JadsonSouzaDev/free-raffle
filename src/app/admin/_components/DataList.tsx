@@ -33,6 +33,7 @@ interface DataListProps<T> {
   data: T[];
   fields: FieldConfig<T>[];
   onEdit?: (item: T) => void;
+  onEditCondition?: (item: T) => boolean;
   onDelete?: (item: T) => void;
   onDeleteCondition?: (item: T) => boolean;
   onSort?: (sortConfig: SortConfig) => void;
@@ -54,6 +55,7 @@ export function DataList<T>({
   data,
   fields,
   onEdit,
+  onEditCondition,
   onDelete,
   onDeleteCondition,
   onSort,
@@ -109,7 +111,7 @@ export function DataList<T>({
                 <Eye className="w-4 h-4" />
                 <span className="text-xs">Detalhes</span>
               </button>
-              {onEdit && (
+              {onEdit && onEditCondition?.(item) && (
                 <button
                   onClick={() => onEdit(item)}
                   className="flex items-center gap-2 px-3 py-2 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white"
@@ -196,7 +198,7 @@ export function DataList<T>({
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  {onEdit && (
+                  {onEdit && onEditCondition?.(item) && (
                     <button
                       onClick={() => onEdit(item)}
                       className="cursor-pointer p-1 text-white hover:bg-white/10 rounded-lg transition-colors "

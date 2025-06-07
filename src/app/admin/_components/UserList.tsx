@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDate } from "@/app/utils/data";
+import { formatDateAndTime } from "@/app/utils/data";
 import { DataList } from "./DataList";
 import {
   DEFAULT_PAGINATION,
@@ -105,7 +105,7 @@ export function UserList({
             key: "createdAt",
             label: "Cadastro",
             render: (value) => (
-              <span className="">{formatDate(value as string)}</span>
+              <span className="">{formatDateAndTime(value as string)}</span>
             ),
           },
         ]}
