@@ -10,6 +10,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { formatCurrency } from "../utils/currency";
 import { formatTimeRemaining } from "../utils/time";
+import confetti from "canvas-confetti";
 
 interface Order {
   id: string;
@@ -24,6 +25,8 @@ interface Order {
     amount: number;
   };
   quotas: number[];
+  isWinner?: boolean;
+  winnerQuotas?: number[];
 }
 
 const statusMap = {
@@ -46,11 +49,13 @@ const statusColorMap = {
 
 export default function PedidosPage() {
   return (
-    <Suspense fallback={
-      <div className="flex justify-center items-center p-8">
-        <span className="text-lg">Carregando...</span>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center p-8">
+          <span className="text-lg">Carregando...</span>
+        </div>
+      }
+    >
       <PedidosContent />
     </Suspense>
   );
@@ -103,11 +108,41 @@ function PedidosContent() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(Date.now());      
+      setCurrentTime(Date.now());
     }, 1000);
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    // Dispara o confete quando encontrar um pedido vencedor
+    const hasWinner = orders.some(order => order.isWinner);
+    if (hasWinner) {
+      const end = Date.now() + 1000;
+      const colors = ['#FFD700', '#FFA500', '#FF4500', '#FF0000', '#8B0000'];
+
+      (function frame() {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+    }
+  }, [orders]);
 
   const handleWhatsappSubmit = async (whatsapp: string) => {
     setLoading(true);
@@ -150,13 +185,25 @@ function PedidosContent() {
           {filteredOrders.map((order) => (
             <div
               key={order.id}
-              className="flex cursor-pointer flex-col gap-2 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-white"
+              className={`relative flex cursor-pointer flex-col gap-2 p-4 rounded-xl backdrop-blur-sm border border-white/10 shadow-lg text-white ${
+                order.isWinner ? "bg-yellow-600 animate-pulse" : "bg-white/10"
+              }`}
               onClick={() =>
                 ["pending", "waiting_payment", "completed"].includes(
                   order.status
                 ) && toggleOrderExpansion(order.id)
               }
             >
+              {order.isWinner && (
+                <div
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    zIndex: 100,
+                  }}
+                />
+              )}
               <div className="flex justify-between items-center cursor-pointer">
                 <span className="font-bold">Pedido #{order.id.slice(-12)}</span>
                 <div className="flex items-center gap-2">
@@ -177,12 +224,26 @@ function PedidosContent() {
               <div className="flex justify-between items-center">
                 {expandedOrderId !== order.id && (
                   <span className="text-sm opacity-70">
-                    {order.status === "completed" ? `${order.quantity} cota(s)` : ''}
+                    {order.status === "completed"
+                      ? `${order.quantity} cota${order.quantity > 1 ? "s" : ""}`
+                      : ""}
+                    {order.winnerQuotas && order.winnerQuotas.length > 0 && (
+                      <span className="font-bold bg-yellow-500 p-1 text-white rounded-lg ml-1 animate-pulse">
+                        {
+                          `${order.winnerQuotas.length} cota${
+                            order.winnerQuotas.length > 1 ? "s" : ""
+                          } premiada${
+                            order.winnerQuotas.length > 1 ? "s" : ""
+                          }`}
+                      </span>
+                    )}
                   </span>
                 )}
                 <div className="flex items-center gap-2 ml-auto">
                   <span className="text-sm opacity-80 font-bold">
-                    {order.payment?.amount ? formatCurrency(order.payment.amount) : "Não pago"}
+                    {order.payment?.amount
+                      ? formatCurrency(order.payment.amount)
+                      : "Não pago"}
                   </span>
                   <span
                     className={`px-2 py-1 rounded-lg text-sm ${
@@ -223,7 +284,8 @@ function PedidosContent() {
                         />
                       </div>
                       <p className="text-xs text-center opacity-70">
-                        Tempo restante para pagamento: {formatTimeRemaining(order.createdAt, currentTime)}
+                        Tempo restante para pagamento:{" "}
+                        {formatTimeRemaining(order.createdAt, currentTime)}
                       </p>
                       <Image
                         src={`data:image/png;base64,${order.payment?.qrCodeBase64}`}
@@ -250,10 +312,10 @@ function PedidosContent() {
                     <div className="flex flex-wrap gap-2">
                       {order.quotas.map((quota) => (
                         <span
-                          className="bg-red-700 text-white px-2 py-1 rounded-lg text-xs font-bold"
+                          className={`text-white px-2 py-1 rounded-lg text-xs font-bold ${order.winnerQuotas?.includes(quota) ? "bg-yellow-600 animate-pulse" : "bg-red-700"}`}
                           key={quota}
                         >
-                          {quota.toString().padStart(6, '0')}
+                          {quota.toString().padStart(6, "0")}
                         </span>
                       ))}
                     </div>
@@ -272,12 +334,12 @@ function PedidosContent() {
       {orderIdParam && (
         <Link href="/pedidos">
           <div className="flex justify-center items-center ">
-          <button
-            className="cursor-pointer bg-foreground text-white px-4 py-2 rounded-lg hover:bg-foreground/90"
-            onClick={() => setModalOpen(true)}
+            <button
+              className="cursor-pointer bg-foreground text-white px-4 py-2 rounded-lg hover:bg-foreground/90"
+              onClick={() => setModalOpen(true)}
             >
-            Visualizar todos os pedidos
-          </button>
+              Visualizar todos os pedidos
+            </button>
           </div>
         </Link>
       )}

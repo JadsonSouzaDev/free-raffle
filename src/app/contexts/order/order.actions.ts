@@ -186,6 +186,8 @@ export async function getOrdersByUser(rawWhatsapp: string) {
     `
             ).map((quota) => quota.serial_number)
           : [],
+      isWinner: await isWinner(order.id),
+      winnerQuotas: await getWinnerQuotas(order.id),
     }))
   );
   return ordersWithQuotas;
@@ -296,4 +298,27 @@ export async function updateOrderUser(orderId: string, userId: string) {
       AND raffle_awarded_quote_id IS NOT NULL
     )
   `;
+}
+
+export async function isWinner(orderId: string): Promise<boolean> {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  //Verifica se o pedido tem cota ganhadora do sorteio
+  const isWinner = await sql`
+    SELECT * from raffles WHERE winner_quota_id IN (
+      SELECT id FROM quotas WHERE order_id = ${orderId} AND active = true
+    )
+  `;
+
+  return isWinner.length > 0;
+}
+
+export async function getWinnerQuotas(orderId: string): Promise<number[]> {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  const winnerQuotas = await sql`
+    SELECT serial_number FROM quotas WHERE order_id = ${orderId} AND active = true AND raffle_awarded_quote_id IS NOT NULL
+  `;
+
+  return winnerQuotas.map((quota) => quota.serial_number);
 }
