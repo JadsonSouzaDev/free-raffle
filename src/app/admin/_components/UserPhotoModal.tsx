@@ -28,6 +28,7 @@ export function UserPhotoModal({ isOpen, onClose, user }: UserPhotoModalProps) {
       setIsUpdating(true);
       await updateUserPhoto(user.whatsapp, url);
       onClose();
+      window.location.reload();
     } catch (error) {
       console.error("Erro ao atualizar foto:", error);
     } finally {

@@ -259,3 +259,41 @@ export async function getOrders({ raffleId, userId, pagination } : { raffleId?: 
     totalPages: Math.ceil(count / pagination.limit)
   }
 }
+
+export async function updateOrderUser(orderId: string, userId: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  // Verificar se o pedido existe
+  const order = await sql`
+    SELECT * FROM orders WHERE id = ${orderId} AND active = true LIMIT 1
+  `;
+
+  if (!order || order.length === 0) {
+    throw new Error("Pedido não encontrado");
+  }
+
+  // Verificar se o usuário existe
+  const user = await sql`
+    SELECT * FROM users WHERE whatsapp = ${userId} AND active = true LIMIT 1
+  `;
+
+  if (!user || user.length === 0) {
+    throw new Error("Usuário não encontrado");
+  }
+
+  // Atualizar o usuário do pedido
+  await sql`
+    UPDATE orders SET user_id = ${userId} WHERE id = ${orderId}
+  `;
+
+  // Se o pedido tiver cotas premiadas, atualizar o usuário delas também
+  await sql`
+    UPDATE raffles_awarded_quotes SET user_id = ${userId}
+    WHERE id IN (
+      SELECT raffle_awarded_quote_id 
+      FROM quotas 
+      WHERE order_id = ${orderId} 
+      AND raffle_awarded_quote_id IS NOT NULL
+    )
+  `;
+}

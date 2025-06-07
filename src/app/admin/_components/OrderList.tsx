@@ -10,6 +10,8 @@ import { getOrders } from "@/app/contexts/order/order.actions";
 import RaffleSelect from "./RaffleSelect";
 import UserSelect from "./UserSelect";
 import { DEFAULT_PAGINATION, PaginationRequest, PaginationResponse } from "@/app/contexts/common/pagination";
+import { ChangeOwnerModal } from "./ChangeOwnerModal";
+import { User } from "lucide-react";
 
 type OrderStatus =
   | "pending"
@@ -69,6 +71,8 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
   const [userId, setUserId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationRequest>(DEFAULT_PAGINATION);
   const [paginationResponse, setPaginationResponse] = useState<PaginationResponse>(initialPagination);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isChangeOwnerModalOpen, setIsChangeOwnerModalOpen] = useState(false);
 
   const { data: ordersData, isLoading: isLoadingOrders } = useSWR(
     `/api/orders?raffleId=${raffleId}&userId=${userId}&page=${pagination.page}&limit=${pagination.limit}`,
@@ -188,9 +192,33 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
             },
           },
         ]}
-        onEdit={(order) => {
-          console.log("Editar pedido", order);
+        onEdit={() => {}}
+        // onEdit={(order) => {
+        //   setSelectedOrder(order);
+        //   setIsChangeOwnerModalOpen(true);
+        // }}
+        // onEditCondition={() => true}
+        customActions={[
+          {
+            icon: <User className="w-4 h-4" />,
+            label: "Alterar titular",
+            onClick: (order) => {
+              setSelectedOrder(order);
+              setIsChangeOwnerModalOpen(true);
+            },
+            className: "bg-yellow-500 hover:text-yellow-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
+            condition: () => true,
+          },
+        ]}
+      />
+
+      <ChangeOwnerModal
+        isOpen={isChangeOwnerModalOpen}
+        onClose={() => {
+          setIsChangeOwnerModalOpen(false);
+          setSelectedOrder(null);
         }}
+        order={selectedOrder}
       />
     </>
   );
