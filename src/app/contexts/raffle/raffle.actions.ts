@@ -390,7 +390,13 @@ export async function updateRaffle(raffleId: string, formData: UpdateRaffleFormD
     if (quote.id) {
       await sql`UPDATE raffles_awarded_quotes SET reference_number = ${quote.reference_number}, gift = ${quote.award} WHERE id = ${quote.id}`;
     } else {
-      await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number, gift) VALUES (${raffleId}, ${quote.reference_number}, ${quote.award})`;
+      const result = await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number, gift) VALUES (${raffleId}, ${quote.reference_number}, ${quote.award}) RETURNING id`;
+      const awardedQuoteId = result[0].id;
+      // Verifica se a cota premiada já foi comprada
+      const quota = await sql`SELECT id FROM quotas WHERE raffle_id = ${raffleId} AND serial_number = ${quote.reference_number} limit 1`;
+      if (quota.length > 0) {
+        await sql`UPDATE quotas SET raffle_awarded_quote_id = ${awardedQuoteId} WHERE id = ${quota[0].id}`;
+      }
     }
   }
 }
