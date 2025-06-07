@@ -11,7 +11,8 @@ import RaffleSelect from "./RaffleSelect";
 import UserSelect from "./UserSelect";
 import { DEFAULT_PAGINATION, PaginationRequest, PaginationResponse } from "@/app/contexts/common/pagination";
 import { ChangeOwnerModal } from "./ChangeOwnerModal";
-import { User } from "lucide-react";
+import { HandCoins, User } from "lucide-react";
+import PayOrderModal from "./PayOrderModal";
 
 type OrderStatus =
   | "pending"
@@ -41,10 +42,12 @@ const statusColors = {
 
 const gatewayMap = {
   MERCADO_PAGO: "Mercado Pago",
+  MANUAL: "Manual",
 };
 
 const paymentTypeMap = {
   pix: "Pix",
+  manual: "Manual",
 };
 
 interface Order {
@@ -73,6 +76,7 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
   const [paginationResponse, setPaginationResponse] = useState<PaginationResponse>(initialPagination);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isChangeOwnerModalOpen, setIsChangeOwnerModalOpen] = useState(false);
+  const [isPayOrderModalOpen, setIsPayOrderModalOpen] = useState(false);
 
   const { data: ordersData, isLoading: isLoadingOrders } = useSWR(
     `/api/orders?raffleId=${raffleId}&userId=${userId}&page=${pagination.page}&limit=${pagination.limit}`,
@@ -172,8 +176,10 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
           {
             key: "type",
             label: "Tipo de pagamento",
-            render: (value, item) =>
-              paymentTypeMap[value as keyof typeof paymentTypeMap] || paymentTypeMap[item.payment?.type as keyof typeof paymentTypeMap],
+            render: (value, item) => {
+              const realValue = item.payment?.gateway === "MANUAL" ? "manual" : value || item.payment?.type;
+              return paymentTypeMap[realValue as keyof typeof paymentTypeMap] || paymentTypeMap[realValue as keyof typeof paymentTypeMap];
+            },
             onlyDetail: true,
           },
           {
@@ -193,11 +199,6 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
           },
         ]}
         onEdit={() => {}}
-        // onEdit={(order) => {
-        //   setSelectedOrder(order);
-        //   setIsChangeOwnerModalOpen(true);
-        // }}
-        // onEditCondition={() => true}
         customActions={[
           {
             icon: <User className="w-4 h-4" />,
@@ -209,6 +210,16 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
             className: "bg-yellow-500 hover:text-yellow-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
             condition: () => true,
           },
+          {
+            icon: <HandCoins className="w-4 h-4" />,
+            label: "Pagar manualmente",
+            onClick: (order) => {
+              setSelectedOrder(order);
+              setIsPayOrderModalOpen(true);
+            },
+            className: "bg-green-500 hover:text-green-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
+            condition: (order) => order.status === "pending" || order.status === "waiting_payment" || order.status === "expired",
+          }
         ]}
       />
 
@@ -218,6 +229,12 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
           setIsChangeOwnerModalOpen(false);
           setSelectedOrder(null);
         }}
+        order={selectedOrder}
+      />
+
+      <PayOrderModal
+        isOpen={isPayOrderModalOpen}
+        onClose={() => setIsPayOrderModalOpen(false)}
         order={selectedOrder}
       />
     </>

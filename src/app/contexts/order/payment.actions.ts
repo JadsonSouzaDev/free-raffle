@@ -2,6 +2,7 @@
 
 import { neon } from "@neondatabase/serverless";
 import { createPixPayment } from "./mercado-pago.gateway";
+import { orderPaid } from "./order.actions";
 
 export async function createPayment(orderId: string, amount: number) {
   const sql = neon(process.env.DATABASE_URL!);
@@ -82,4 +83,21 @@ export async function getPayment(orderId: string) {
     createdAt: payment[0].created_at,
     updatedAt: payment[0].updated_at
   }
+}
+
+export async function payOrderManually(orderId: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  const order = await sql`
+    SELECT * FROM orders WHERE id = ${orderId}
+  `;
+
+  if (!order.length) {
+    throw new Error("Order not found");
+  }
+  await sql`
+    UPDATE payments SET status = 'approved', gateway_id = 'manual', gateway = 'MANUAL' WHERE order_id = ${orderId}
+  `;
+
+  await orderPaid(orderId);
 }

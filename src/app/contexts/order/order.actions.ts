@@ -67,7 +67,7 @@ export async function orderPaid(orderId: string) {
   `;
 
   const order = await sql`
-    SELECT * FROM orders WHERE id = ${orderId} AND status = 'waiting_payment' AND active = true LIMIT 1
+    SELECT * FROM orders WHERE id = ${orderId} AND status IN ('waiting_payment', 'pending', 'expired') AND active = true LIMIT 1
   `;
 
   if (!order || order.length === 0) {

@@ -15,7 +15,6 @@ import { Camera } from "lucide-react";
 import { UserPhotoModal } from "./UserPhotoModal";
 
 interface User {
-  id: string;
   whatsapp: string;
   name: string;
   roles: string[];
