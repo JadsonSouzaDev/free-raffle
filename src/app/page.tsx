@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Gift } from "lucide-react";
 import { ImageCarousel } from "./components/ImageCarousel";
 import Winners from "./components/Winners";
+import WhatsappSuport from "./components/WhatsappSuport";
 
 const statuses = {
   active: "Compre já!",
@@ -88,6 +89,7 @@ export default async function Home() {
       })}
 
       <Winners />
+      <WhatsappSuport />
     </div>
   );
 }

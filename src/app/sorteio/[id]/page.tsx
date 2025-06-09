@@ -14,6 +14,7 @@ import {
   getStartOfWeek,
 } from "@/app/utils/date";
 import { ImageCarousel } from "@/app/components/ImageCarousel";
+import WhatsappSuport from "@/app/components/WhatsappSuport";
 
 interface SorteioPageProps {
   params: Promise<{
@@ -230,6 +231,8 @@ async function SorteioPage({ params }: SorteioPageProps) {
         </div>
         <p className="text-sm font-normal">{raffle.description}</p>
       </div>
+
+      <WhatsappSuport />
     </div>
   );
 }
