@@ -33,6 +33,7 @@ export class Raffle {
   highestQuota?: RaffleHighestQuota;
   quotasSold?: number;
   flags!: RaffleFlag;
+  progress!: number;
   constructor(data: RaffleData) {
     this.id = data.id;
     this.title = data.title;
@@ -44,6 +45,7 @@ export class Raffle {
     this.updatedAt = data.updated_at;
     this.winnerQuotaId = data.winner_quota_id;
     this.quotasSold = 0;
+    this.progress = 0;
   }
 
   setPrices(prices: RafflePrice[]) {
@@ -80,6 +82,10 @@ export class Raffle {
 
   setFlags(flags: RaffleFlag) {
     this.flags = flags;
+  }
+
+  setProgress(progress: number) {
+    this.progress = progress;
   }
 
   get status(): "active" | "finished" {

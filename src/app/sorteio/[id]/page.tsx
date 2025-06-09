@@ -91,6 +91,15 @@ async function SorteioPage({ params }: SorteioPageProps) {
                 ))}
               </div>
             </div>
+
+            {/* Progress bar */}
+            {flags.flagProgress && raffle.progress >= 10 && <div className="w-full h-5 bg-foreground/10 rounded-full">
+              <div className="animate-pulse flex items-center justify-center h-full bg-red-600 rounded-full" style={{ width: `${raffle.progress}%` }}>
+                <span className="text-white text-[11px] font-bold">
+                  {raffle.progress.toFixed(2)}%
+                </span>
+              </div>
+            </div>}
           </>
         )}
       </div>

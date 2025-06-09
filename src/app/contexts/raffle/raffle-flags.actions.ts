@@ -18,6 +18,7 @@ export async function getRaffleFlags(raffleId: string) {
     flagTopBuyersDay: flags.flagTopBuyersDay,
     flagLowestQuota: flags.flagLowestQuota,
     flagHighestQuota: flags.flagHighestQuota,
+    flagProgress: flags.flagProgress,
   }
 }
 
@@ -44,4 +45,9 @@ export async function updateLowestQuotaFlag(raffleId: string, flag: boolean) {
 export async function updateHighestQuotaFlag(raffleId: string, flag: boolean) {
   const sql = neon(`${process.env.DATABASE_URL}`);
   await sql`UPDATE raffles_flags SET flag_highest_quota = ${flag} WHERE id = ${raffleId}`;
+}
+
+export async function updateProgressFlag(raffleId: string, flag: boolean) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  await sql`UPDATE raffles_flags SET flag_progress = ${flag} WHERE id = ${raffleId}`;
 }

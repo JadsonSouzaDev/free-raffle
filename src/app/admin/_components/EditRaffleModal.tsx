@@ -14,7 +14,8 @@ import {
   updateTopBuyerDayFlag,
   updateLowestQuotaFlag,
   updateHighestQuotaFlag,
-  getRaffleFlags
+  updateProgressFlag,
+  getRaffleFlags,
 } from '@/app/contexts/raffle/raffle-flags.actions';
 import { getRaffleById, updateRaffle } from '@/app/contexts/raffle/raffle.actions';
 import useSWR from "swr";
@@ -96,6 +97,7 @@ type FlagState = {
   flagTopBuyersDay: boolean;
   flagLowestQuota: boolean;
   flagHighestQuota: boolean;
+  flagProgress: boolean;
 };
 
 const defaultFlags: FlagState = {
@@ -104,6 +106,7 @@ const defaultFlags: FlagState = {
   flagTopBuyersDay: false,
   flagLowestQuota: false,
   flagHighestQuota: false,
+  flagProgress: false,
 };
 
 const EditRaffleModal = ({ raffleId, isOpen, onClose, onSuccess }: EditRaffleModalProps) => {
@@ -155,6 +158,7 @@ const EditRaffleModal = ({ raffleId, isOpen, onClose, onSuccess }: EditRaffleMod
         flagTopBuyersDay: flags.flagTopBuyersDay,
         flagLowestQuota: flags.flagLowestQuota,
         flagHighestQuota: flags.flagHighestQuota,
+        flagProgress: flags.flagProgress,
       });
     }
   }, [flags]);
@@ -196,7 +200,8 @@ const EditRaffleModal = ({ raffleId, isOpen, onClose, onSuccess }: EditRaffleMod
         flagTopBuyersWeek: updateTopBuyerWeekFlag,
         flagTopBuyersDay: updateTopBuyerDayFlag,
         flagLowestQuota: updateLowestQuotaFlag,
-        flagHighestQuota: updateHighestQuotaFlag
+        flagHighestQuota: updateHighestQuotaFlag,
+        flagProgress: updateProgressFlag,
       }[flag];
 
       await updateFlagAction(raffleId, newValue);
@@ -561,6 +566,24 @@ const EditRaffleModal = ({ raffleId, isOpen, onClose, onSuccess }: EditRaffleMod
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     flagsState.flagHighestQuota ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Progress */}
+            <div className="flex items-center justify-between">
+              <label className="text-sm">Exibir Progresso</label>
+              <button
+                onClick={() => handleToggle('flagProgress')}
+                className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  flagsState.flagProgress ? 'bg-red-600' : 'bg-gray-200'
+                }`}
+                disabled={loadingFlags.flagProgress}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    flagsState.flagProgress ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>

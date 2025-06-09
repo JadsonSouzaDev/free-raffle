@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS raffles_flags (
   flag_top_buyers_day BOOLEAN DEFAULT false,
   flag_lowest_quota BOOLEAN DEFAULT false,
   flag_highest_quota BOOLEAN DEFAULT false,
+  flag_progress BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

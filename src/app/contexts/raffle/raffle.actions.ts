@@ -313,6 +313,13 @@ export async function getRaffle(id: string): Promise<Raffle> {
   const flags = await sql`SELECT * FROM raffles_flags WHERE id = ${raffle.id}`;
   raffle.setFlags(new RaffleFlag(flags[0] as unknown as RaffleFlagData));
 
+  // get progress
+  const countResult = await sql`SELECT COUNT(*) FROM quotas WHERE raffle_id = ${raffle.id}`;
+  const quotasSold = countResult[0].count || 0;
+  const MAX_SOLDED_QUOTAS = 999999;
+  const progress = (quotasSold / MAX_SOLDED_QUOTAS) * 100;
+  raffle.setProgress(progress);
+
   return raffle;
 }
 
