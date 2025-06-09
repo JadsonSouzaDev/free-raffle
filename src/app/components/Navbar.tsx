@@ -48,10 +48,11 @@ export function Navbar() {
         <Link href="/" className="cursor-pointer">
           <div className="flex flex-col items-center">
             <Image
-              src="https://caradebone.com/products/1704494621.png"
+              src="/logo.webp"
               alt="Logo"
               width={97}
               height={55}
+              priority
               className="h-[40px] md:h-[50px] w-auto"
             />
           </div>
