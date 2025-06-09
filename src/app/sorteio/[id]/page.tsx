@@ -111,6 +111,7 @@ async function SorteioPage({ params }: SorteioPageProps) {
             raffle={{
               id: raffle.id,
               title: raffle.title,
+              preQuantityNumbers: raffle.preQuantityNumbers,
               prices: raffle.prices.map((price) => ({
                 id: price.id,
                 price: price.price,

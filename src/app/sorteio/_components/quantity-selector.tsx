@@ -9,6 +9,7 @@ import OrderModal from "./order-modal";
 interface SerializedRaffle {
   id: string;
   title: string;
+  preQuantityNumbers: number[];
   prices: {
     id: string;
     price: number;
@@ -33,39 +34,9 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-3 gap-1 md:hidden">
+      <div className="grid grid-cols-3 gap-1">
         {[
-          ...new Set([
-            25,
-            50,
-            100,
-            200,
-            300,
-            Math.max(...raffle.prices.map((p) => p.quantity)),
-          ]),
-        ]
-          .sort((a, b) => a - b)
-          .map((value) => (
-            <QuantityButton
-              key={value}
-              value={value}
-              raffle={raffle}
-              onClick={() => handleQuantityClick(value)}
-            />
-          ))}
-      </div>
-      <div className="md:grid md:grid-cols-4 gap-1 hidden">
-        {[
-          ...new Set([
-            10,
-            25,
-            50,
-            100,
-            200,
-            300,
-            400,
-            Math.max(...raffle.prices.map((p) => p.quantity)),
-          ]),
+          ...new Set(raffle.preQuantityNumbers),
         ]
           .sort((a, b) => a - b)
           .map((value) => (

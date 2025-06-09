@@ -23,6 +23,7 @@ export type RaffleResponse = {
   title: string;
   description: string;
   imagesUrls: string[];
+  preQuantityNumbers: number[];
   prices: Array<{
     id: string;
     price: number;
@@ -89,8 +90,9 @@ export async function createRaffle(formData: CreateRaffleFormData) {
   const title = formData.title
   const images_urls = formData.imagesUrls.join(",");
   const description = formData.description;
+  const preQuantityNumbers = formData.preQuantityNumbers;
   const result =
-    (await sql`INSERT INTO raffles (title, images_urls, description) VALUES (${title}, ARRAY[${images_urls}], ${description}) RETURNING id`) as unknown as {
+    (await sql`INSERT INTO raffles (title, images_urls, description, pre_quantity_numbers) VALUES (${title}, ARRAY[${images_urls}], ${description}, ${preQuantityNumbers}) RETURNING id`) as unknown as {
       id: string;
     }[];
   const raffle_id = result[0].id;
@@ -164,6 +166,7 @@ export async function getRaffleById(id: string): Promise<RaffleResponse>{
     title: raffle.title,
     description: raffle.description,
     imagesUrls: raffle.imagesUrls,
+    preQuantityNumbers: raffle.preQuantityNumbers,
     prices: raffle.prices.map(price => ({
       id: price.id,
       price: price.price,
@@ -355,7 +358,8 @@ export async function updateRaffle(raffleId: string, formData: UpdateRaffleFormD
   const title = formData.title;
   const images_urls = formData.imagesUrls.join(",");
   const description = formData.description;
-  await sql`UPDATE raffles SET title = ${title}, images_urls = ARRAY[${images_urls}], description = ${description} WHERE id = ${raffleId}`;
+  const preQuantityNumbers = formData.preQuantityNumbers;
+  await sql`UPDATE raffles SET title = ${title}, images_urls = ARRAY[${images_urls}], description = ${description}, pre_quantity_numbers = ${preQuantityNumbers} WHERE id = ${raffleId}`;
 
   // get existing prices and awarded quotes
   const existingPrices = await sql`SELECT id, quantity FROM raffles_prices WHERE raffle_id = ${raffleId} AND active = true`;

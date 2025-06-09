@@ -13,6 +13,16 @@ const createRaffleSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
   description: z.string().min(1, "A descrição é obrigatória"),
   imagesUrls: z.array(z.string()).min(1, "A imagem é obrigatória"),
+  preQuantityNumbers: z.array(z.number())
+    .min(1, "Adicione pelo menos um número pré-definido")
+    .refine(
+      (numbers) => {
+        return new Set(numbers).size === numbers.length;
+      },
+      {
+        message: "Não é permitido ter números repetidos",
+      }
+    ),
   prices: z.array(z.object({
     quantity: z.number({
       required_error: "A quantidade é obrigatória",
@@ -89,6 +99,7 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
     resolver: zodResolver(createRaffleSchema),
     defaultValues: {
       imagesUrls: [],
+      preQuantityNumbers: [25, 50, 100, 200, 300, 500],
       prices: [{ quantity: 1, pricePerUnit: 0.07 }, { quantity: 10, pricePerUnit: 0.06 }],
       awardedNumbers: [{ reference_number: 999999, award: "R$1.000,00" }],
     },
@@ -233,6 +244,39 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
                     </span>
                   )}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Números Pré-definidos</label>
+            <div className="text-[11px] md:text-xs text-gray-500 mb-0 md:mb-4">
+              <p>• Não é permitido ter números repetidos</p>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              {watch("preQuantityNumbers")?.map((number, index) => (
+                <div key={index} className="flex flex-col mb-4">
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      {...register(`preQuantityNumbers.${index}` as const, {
+                        valueAsNumber: true,
+                      })}
+                      className="w-full p-2 border rounded-md"
+                      placeholder="Ex: 10"
+                    />
+                    {errors.preQuantityNumbers?.[index] && (
+                      <span className="text-red-500 text-xs">
+                        {errors.preQuantityNumbers[index]?.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {errors.preQuantityNumbers?.root && (
+              <span className="text-red-500 text-xs block mt-2">
+                {errors.preQuantityNumbers.root.message}
+              </span>
+            )}
           </div>
 
           <div>

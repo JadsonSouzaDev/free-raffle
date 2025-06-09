@@ -8,6 +8,7 @@ export type RaffleData = {
   images_urls: string[];
   description: string;
   winner_quota_id?: string;
+  pre_quantity_numbers: number[];
   active: boolean;
   hidden: boolean;
   created_at: Date;
@@ -20,6 +21,7 @@ export class Raffle {
   imagesUrls!: string[];
   description!: string;
   winnerQuotaId?: string;
+  preQuantityNumbers!: number[];
   active!: boolean;
   hidden!: boolean;
   createdAt!: Date;
@@ -39,6 +41,7 @@ export class Raffle {
     this.title = data.title;
     this.imagesUrls = data.images_urls[0].split(",");
     this.description = data.description;
+    this.preQuantityNumbers = data.pre_quantity_numbers;
     this.active = data.active;
     this.hidden = data.hidden;
     this.createdAt = data.created_at;
