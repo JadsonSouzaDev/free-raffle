@@ -1,4 +1,7 @@
-import { getRaffle, getRaffleWinner } from "@/app/contexts/raffle/raffle.actions";
+import {
+  getRaffle,
+  getRaffleWinner,
+} from "@/app/contexts/raffle/raffle.actions";
 import { formatCurrency } from "@/app/utils/currency";
 import QuantitySelector from "../_components/quantity-selector";
 import TopBuyers from "../_components/top-buyers";
@@ -182,20 +185,6 @@ async function SorteioPage({ params }: SorteioPageProps) {
             />
           )}
 
-        </>
-      )}
-      {raffle.status === "finished" && (
-        <TopBuyers
-          title="Ganhador"
-          isReferenceNumber
-          topBuyers={winner ? [{
-            id: winner.whatsapp,
-            name: winner.name,
-            quantity: 1,
-            referenceNumber: winner.serial_number,
-          }] : []}
-        />
-      )}
           <AwardQuotes
             awardedQuotes={raffle.awardedQuotes?.map((quote) => ({
               id: quote.id,
@@ -204,14 +193,34 @@ async function SorteioPage({ params }: SorteioPageProps) {
               user: quote.user,
             }))}
           />
+        </>
+      )}
+      {raffle.status === "finished" && (
+        <TopBuyers
+          title="Ganhador"
+          isReferenceNumber
+          topBuyers={
+            winner
+              ? [
+                  {
+                    id: winner.whatsapp,
+                    name: winner.name,
+                    quantity: 1,
+                    referenceNumber: winner.serial_number,
+                  },
+                ]
+              : []
+          }
+        />
+      )}
 
-          <div className="flex flex-col gap-2 text-white">
-            <div className="flex items-center gap-2">
-              <Info className="w-5 h-5" />
-              <h2 className="text-lg font-bold">Descrição e regras:</h2>
-            </div>
-            <p className="text-sm font-normal">{raffle.description}</p>
-          </div>
+      <div className="flex flex-col gap-2 text-white">
+        <div className="flex items-center gap-2">
+          <Info className="w-5 h-5" />
+          <h2 className="text-lg font-bold">Descrição e regras:</h2>
+        </div>
+        <p className="text-sm font-normal">{raffle.description}</p>
+      </div>
     </div>
   );
 }
