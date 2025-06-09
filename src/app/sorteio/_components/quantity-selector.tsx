@@ -10,6 +10,8 @@ interface SerializedRaffle {
   id: string;
   title: string;
   preQuantityNumbers: number[];
+  minQuantity: number;
+  maxQuantity: number;
   prices: {
     id: string;
     price: number;
@@ -18,7 +20,7 @@ interface SerializedRaffle {
 }
 
 const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
-  const [selectedQuantity, setSelectedQuantity] = useState<number>(1);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(raffle.minQuantity || 1);
   const [open, setOpen] = useState<boolean>(false);
 
   const currentPrice = useMemo(() => 
@@ -41,6 +43,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
           .sort((a, b) => a - b)
           .map((value) => (
             <QuantityButton
+              disabled={selectedQuantity + value > raffle.maxQuantity}
               key={value}
               value={value}
               raffle={raffle}
@@ -53,7 +56,7 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
         <div className="flex flex-row items-center justify-between w-full md:w-[300px] mx-auto gap-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 shadow-lg text-foreground p-2">
           <button
             onClick={() => handleQuantityClick(-1)}
-            disabled={selectedQuantity <= 1}
+            disabled={selectedQuantity <= raffle.minQuantity}
             className="cursor-pointer hover:bg-foreground/90 bg-foreground text-white p-3 rounded-lg transition-colors duration-300 flex flex-col items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Minus className="w-5 h-5" />
@@ -61,11 +64,10 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
           <input
             type="number"
             value={selectedQuantity}
-            onChange={(e) =>
-              handleQuantityClick(Number(e.target.value) - selectedQuantity)
-            }
+            readOnly
             className="font-bold text-white text-xl md:text-2xl w-20 text-center bg-transparent border-none focus:outline-none"
-            min="0"
+            min={raffle.minQuantity}
+            max={raffle.maxQuantity}
           />
           <button
             onClick={() => handleQuantityClick(1)}

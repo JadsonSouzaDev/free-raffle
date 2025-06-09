@@ -9,6 +9,8 @@ export type RaffleData = {
   description: string;
   winner_quota_id?: string;
   pre_quantity_numbers: number[];
+  min_quantity: number;
+  max_quantity: number;
   active: boolean;
   hidden: boolean;
   created_at: Date;
@@ -22,6 +24,8 @@ export class Raffle {
   description!: string;
   winnerQuotaId?: string;
   preQuantityNumbers!: number[];
+  minQuantity!: number;
+  maxQuantity!: number;
   active!: boolean;
   hidden!: boolean;
   createdAt!: Date;
@@ -42,6 +46,8 @@ export class Raffle {
     this.imagesUrls = data.images_urls[0].split(",");
     this.description = data.description;
     this.preQuantityNumbers = data.pre_quantity_numbers;
+    this.minQuantity = data.min_quantity;
+    this.maxQuantity = data.max_quantity;
     this.active = data.active;
     this.hidden = data.hidden;
     this.createdAt = data.created_at;
@@ -89,6 +95,10 @@ export class Raffle {
 
   setProgress(progress: number) {
     this.progress = progress;
+  }
+
+  setMaxQuantity(max_quantity: number) {
+    this.maxQuantity = max_quantity;
   }
 
   get status(): "active" | "finished" {

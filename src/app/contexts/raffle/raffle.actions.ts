@@ -24,6 +24,8 @@ export type RaffleResponse = {
   description: string;
   imagesUrls: string[];
   preQuantityNumbers: number[];
+  minQuantity: number;
+  maxQuantity: number;
   prices: Array<{
     id: string;
     price: number;
@@ -91,8 +93,10 @@ export async function createRaffle(formData: CreateRaffleFormData) {
   const images_urls = formData.imagesUrls.join(",");
   const description = formData.description;
   const preQuantityNumbers = formData.preQuantityNumbers;
+  const minQuantity = formData.minQuantity;
+  const maxQuantity = formData.maxQuantity;
   const result =
-    (await sql`INSERT INTO raffles (title, images_urls, description, pre_quantity_numbers) VALUES (${title}, ARRAY[${images_urls}], ${description}, ${preQuantityNumbers}) RETURNING id`) as unknown as {
+    (await sql`INSERT INTO raffles (title, images_urls, description, pre_quantity_numbers, min_quantity, max_quantity) VALUES (${title}, ARRAY[${images_urls}], ${description}, ${preQuantityNumbers}, ${minQuantity}, ${maxQuantity}) RETURNING id`) as unknown as {
       id: string;
     }[];
   const raffle_id = result[0].id;
@@ -167,6 +171,8 @@ export async function getRaffleById(id: string): Promise<RaffleResponse>{
     description: raffle.description,
     imagesUrls: raffle.imagesUrls,
     preQuantityNumbers: raffle.preQuantityNumbers,
+    minQuantity: raffle.minQuantity,
+    maxQuantity: raffle.maxQuantity,
     prices: raffle.prices.map(price => ({
       id: price.id,
       price: price.price,
@@ -236,6 +242,8 @@ export async function getRaffle(id: string): Promise<Raffle> {
     throw new Error("Raffle not found");
   }
   const raffle = new Raffle(rawRaffle[0] as unknown as RaffleData);
+
+
 
   // get prices
   const prices =
@@ -323,6 +331,11 @@ export async function getRaffle(id: string): Promise<Raffle> {
   const progress = (quotasSold / MAX_SOLDED_QUOTAS) * 100;
   raffle.setProgress(progress);
 
+  // if max quantity is greater than the number of solded quotas, set max quantity to the number of solded quotas
+  if(raffle.maxQuantity > MAX_SOLDED_QUOTAS - quotasSold) {
+    raffle.setMaxQuantity(MAX_SOLDED_QUOTAS - quotasSold);
+  }
+
   return raffle;
 }
 
@@ -359,7 +372,9 @@ export async function updateRaffle(raffleId: string, formData: UpdateRaffleFormD
   const images_urls = formData.imagesUrls.join(",");
   const description = formData.description;
   const preQuantityNumbers = formData.preQuantityNumbers;
-  await sql`UPDATE raffles SET title = ${title}, images_urls = ARRAY[${images_urls}], description = ${description}, pre_quantity_numbers = ${preQuantityNumbers} WHERE id = ${raffleId}`;
+  const minQuantity = formData.minQuantity;
+  const maxQuantity = formData.maxQuantity;
+  await sql`UPDATE raffles SET title = ${title}, images_urls = ARRAY[${images_urls}], description = ${description}, pre_quantity_numbers = ${preQuantityNumbers}, min_quantity = ${minQuantity}, max_quantity = ${maxQuantity} WHERE id = ${raffleId}`;
 
   // get existing prices and awarded quotes
   const existingPrices = await sql`SELECT id, quantity FROM raffles_prices WHERE raffle_id = ${raffleId} AND active = true`;

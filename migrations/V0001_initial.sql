@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS raffles (
   active BOOLEAN DEFAULT true,
   hidden BOOLEAN DEFAULT false,
   pre_quantity_numbers INTEGER[] DEFAULT ARRAY[25,50,100,200,300,500],
+  min_quantity INTEGER DEFAULT 1,
+  max_quantity INTEGER DEFAULT 999999,
   winner_quota_id UUID REFERENCES quotas(id),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()

@@ -13,6 +13,10 @@ const createRaffleSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
   description: z.string().min(1, "A descrição é obrigatória"),
   imagesUrls: z.array(z.string()).min(1, "A imagem é obrigatória"),
+  minQuantity: z.number().min(1, "A quantidade mínima deve ser maior que 0"),
+  maxQuantity: z.number()
+    .min(1, "A quantidade máxima deve ser maior que 0")
+    .max(999999, "A quantidade máxima não pode ultrapassar 999.999"),
   preQuantityNumbers: z.array(z.number())
     .min(1, "Adicione pelo menos um número pré-definido")
     .refine(
@@ -77,7 +81,15 @@ const createRaffleSchema = z.object({
       message: "Não é permitido ter números premiados repetidos",
     }
   ),
-});
+}).refine(
+    (data) => {
+      return data.maxQuantity >= data.minQuantity;
+    },
+    {
+      message: "A quantidade máxima deve ser maior ou igual à quantidade mínima",
+      path: ["maxQuantity"],
+    }
+  );
 
 export type CreateRaffleFormData = z.infer<typeof createRaffleSchema>;
 
@@ -99,6 +111,8 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
     resolver: zodResolver(createRaffleSchema),
     defaultValues: {
       imagesUrls: [],
+      minQuantity: 1,
+      maxQuantity: 999999,
       preQuantityNumbers: [25, 50, 100, 200, 300, 500],
       prices: [{ quantity: 1, pricePerUnit: 0.07 }, { quantity: 10, pricePerUnit: 0.06 }],
       awardedNumbers: [{ reference_number: 999999, award: "R$1.000,00" }],
@@ -243,6 +257,38 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
                       {errors.imagesUrls?.message}
                     </span>
                   )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Quantidade Mínima de Cotas</label>
+              <input
+                type="number"
+                {...register("minQuantity", {
+                  valueAsNumber: true,
+                })}
+                className="w-full p-2 border rounded-md"
+                placeholder="Ex: 1"
+              />
+              {errors.minQuantity && (
+                <span className="text-red-500 text-xs">{errors.minQuantity.message}</span>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Quantidade Máxima de Cotas</label>
+              <input
+                type="number"
+                {...register("maxQuantity", {
+                  valueAsNumber: true,
+                })}
+                className="w-full p-2 border rounded-md"
+                placeholder="Ex: 999999"
+              />
+              {errors.maxQuantity && (
+                <span className="text-red-500 text-xs">{errors.maxQuantity.message}</span>
+              )}
             </div>
           </div>
 

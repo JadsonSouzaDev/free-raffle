@@ -112,6 +112,8 @@ async function SorteioPage({ params }: SorteioPageProps) {
               id: raffle.id,
               title: raffle.title,
               preQuantityNumbers: raffle.preQuantityNumbers,
+              minQuantity: raffle.minQuantity,
+              maxQuantity: raffle.maxQuantity,
               prices: raffle.prices.map((price) => ({
                 id: price.id,
                 price: price.price,
