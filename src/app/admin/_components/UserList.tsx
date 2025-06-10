@@ -121,9 +121,6 @@ export function UserList({
             ),
           },
         ]}
-        onDelete={(user) => {
-          console.log("Deletar usuário", user);
-        }}
         onDeleteCondition={(user) => {
           return !user.roles.includes("admin");
         }}
