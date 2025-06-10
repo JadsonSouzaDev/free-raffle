@@ -145,10 +145,11 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const orders = await sql`
-    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount
+    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount, r.title as raffle_title
     FROM orders o
     LEFT JOIN payments p ON o.id = p.order_id
-    WHERE o.user_id = ${whatsapp}
+    LEFT JOIN raffles r ON o.raffle_id = r.id
+    WHERE o.user_id = ${whatsapp} AND o.active = true
     ORDER BY o.created_at DESC
   `;
 
@@ -167,6 +168,7 @@ export async function getOrdersByUser(rawWhatsapp: string) {
     orders.map(async (order) => ({
       id: order.id,
       raffleId: order.raffle_id,
+      raffleTitle: order.raffle_title,
       userId: order.user_id,
       quantity: order.quotas_quantity,
       status: order.status,
@@ -198,6 +200,7 @@ export async function getOrders({ raffleId, userId, pagination } : { raffleId?: 
 
   const where = sql`
     WHERE 1=1
+    AND o.active = true
     ${raffleId ? sql`AND o.raffle_id = ${raffleId}` : sql``}
     ${userId ? sql`AND o.user_id = ${userId}` : sql``}
   `;
@@ -321,4 +324,13 @@ export async function getWinnerQuotas(orderId: string): Promise<number[]> {
   `;
 
   return winnerQuotas.map((quota) => quota.serial_number);
+}
+
+
+export async function deleteOrder(orderId: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+
+  await sql`
+    UPDATE orders SET active = false WHERE id = ${orderId}
+  `;
 }

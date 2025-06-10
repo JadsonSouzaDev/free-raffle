@@ -128,8 +128,9 @@ const OrderModal = ({
                 setWhatsapp(formattedValue);
               }}
               placeholder="(00) 00000-0000"
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-2 border rounded-lg disabled:opacity-50"
               maxLength={15}
+              disabled={loading || !!user}
             />
           </div>
 

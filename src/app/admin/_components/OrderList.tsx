@@ -13,6 +13,7 @@ import { DEFAULT_PAGINATION, PaginationRequest, PaginationResponse } from "@/app
 import { ChangeOwnerModal } from "./ChangeOwnerModal";
 import { HandCoins, User } from "lucide-react";
 import PayOrderModal from "./PayOrderModal";
+import DeleteOrderModal from "./DeleteOrderModal";
 
 type OrderStatus =
   | "pending"
@@ -77,6 +78,7 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isChangeOwnerModalOpen, setIsChangeOwnerModalOpen] = useState(false);
   const [isPayOrderModalOpen, setIsPayOrderModalOpen] = useState(false);
+  const [isDeleteOrderModalOpen, setIsDeleteOrderModalOpen] = useState(false);
 
   const { data: ordersData, isLoading: isLoadingOrders } = useSWR(
     `/api/orders?raffleId=${raffleId}&userId=${userId}&page=${pagination.page}&limit=${pagination.limit}`,
@@ -198,6 +200,12 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
             },
           },
         ]}
+        onDelete={(order) => {
+          setSelectedOrder(order);
+          setIsDeleteOrderModalOpen(true);
+        }}
+
+        onDeleteCondition={(order) => order.status === "pending" || order.status === "waiting_payment" || order.status === "expired"}
         onEdit={() => {}}
         customActions={[
           {
@@ -235,6 +243,12 @@ export function OrderList({ orders, initialPagination }: { orders: Order[], init
       <PayOrderModal
         isOpen={isPayOrderModalOpen}
         onClose={() => setIsPayOrderModalOpen(false)}
+        order={selectedOrder}
+      />
+
+      <DeleteOrderModal
+        isOpen={isDeleteOrderModalOpen}
+        onClose={() => setIsDeleteOrderModalOpen(false)}
         order={selectedOrder}
       />
     </>

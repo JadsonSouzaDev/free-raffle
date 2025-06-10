@@ -75,8 +75,10 @@ export async function adjustQuotaNumber(
       UPDATE quotas 
       SET serial_number = ${newSerialNumber}, raffle_awarded_quote_id = ${newIsAwarded}
       WHERE id = ${quotaId}
-      AND active = true
+      AND active = true;
+    `;
 
+    await sql`
       UPDATE raffles_awarded_quotes SET user_id = ${whatsapp} WHERE id = ${newIsAwarded}
     `;
 

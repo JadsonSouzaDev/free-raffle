@@ -28,8 +28,10 @@ export function ChangeOwnerModal({ isOpen, onClose, order }: ChangeOwnerModalPro
       setIsUpdating(true);
       await updateOrderUser(order.id, selectedUserId);
       onClose();
-      window.location.reload();
       toast.success("Titular atualizado com sucesso");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch {
       toast.error("Erro ao atualizar titular");
     } finally {

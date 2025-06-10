@@ -15,6 +15,7 @@ import confetti from "canvas-confetti";
 interface Order {
   id: string;
   raffleId: string;
+  raffleTitle: string;
   userId: string;
   quantity: number;
   status: string;
@@ -103,7 +104,9 @@ function PedidosContent() {
       }
 
       // Cria nova conexão
-      eventSource = new EventSource(`/api/webhooks/mercadopago?orderId=${orderIdParam}`);
+      eventSource = new EventSource(
+        `/api/webhooks/mercadopago?orderId=${orderIdParam}`
+      );
 
       eventSource.onmessage = async (event) => {
         const data = JSON.parse(event.data);
@@ -149,11 +152,15 @@ function PedidosContent() {
   }, []);
 
   useEffect(() => {
-    // Dispara o confete quando encontrar um pedido vencedor
-    const hasWinner = orders.some(order => order.isWinner);
-    if (hasWinner) {
+    // Dispara o confete quando o pedido mais recente for vencedor
+    const mostRecentOrder = orders.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )[0];
+    const hasWinner = mostRecentOrder?.isWinner;
+    if (hasWinner && !orderIdParam) {
       const end = Date.now() + 1000;
-      const colors = ['#FFD700', '#FFA500', '#FF4500', '#FF0000', '#8B0000'];
+      const colors = ["#FFD700", "#FFA500", "#FF4500", "#FF0000", "#8B0000"];
 
       (function frame() {
         confetti({
@@ -161,22 +168,22 @@ function PedidosContent() {
           angle: 60,
           spread: 55,
           origin: { x: 0 },
-          colors: colors
+          colors: colors,
         });
         confetti({
           particleCount: 5,
           angle: 120,
           spread: 55,
           origin: { x: 1 },
-          colors: colors
+          colors: colors,
         });
 
         if (Date.now() < end) {
           requestAnimationFrame(frame);
         }
-      }());
+      })();
     }
-  }, [orders]);
+  }, [orders, orderIdParam]);
 
   const handleWhatsappSubmit = async (whatsapp: string) => {
     setLoading(true);
@@ -239,9 +246,16 @@ function PedidosContent() {
                 />
               )}
               <div className="flex justify-between items-center cursor-pointer">
-                <span className="font-bold">Pedido #{order.id.slice(-12)}</span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-sm">
+                    {order.raffleTitle}
+                  </span>
+                  <span className="hidden md:block text-xs opacity-70 truncate">
+                    #{order.id}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm opacity-70">
+                  <span className="text-xs md:text-sm opacity-70">
                     {formatDateAndTime(order.createdAt)}
                   </span>
                   {["pending", "waiting_payment", "completed"].includes(
@@ -263,12 +277,9 @@ function PedidosContent() {
                       : ""}
                     {order.winnerQuotas && order.winnerQuotas.length > 0 && (
                       <span className="font-bold bg-yellow-500 p-1 text-white rounded-lg ml-1 animate-pulse">
-                        {
-                          `${order.winnerQuotas.length} cota${
-                            order.winnerQuotas.length > 1 ? "s" : ""
-                          } premiada${
-                            order.winnerQuotas.length > 1 ? "s" : ""
-                          }`}
+                        {`${order.winnerQuotas.length} cota${
+                          order.winnerQuotas.length > 1 ? "s" : ""
+                        } premiada${order.winnerQuotas.length > 1 ? "s" : ""}`}
                       </span>
                     )}
                   </span>
@@ -346,7 +357,11 @@ function PedidosContent() {
                     <div className="flex flex-wrap gap-2">
                       {order.quotas.map((quota) => (
                         <span
-                          className={`text-white px-2 py-1 rounded-lg text-xs font-bold ${order.winnerQuotas?.includes(quota) ? "bg-yellow-600 animate-pulse" : "bg-red-700"}`}
+                          className={`text-white px-2 py-1 rounded-lg text-xs font-bold ${
+                            order.winnerQuotas?.includes(quota)
+                              ? "bg-yellow-600 animate-pulse"
+                              : "bg-red-700"
+                          }`}
                           key={quota}
                         >
                           {quota.toString().padStart(6, "0")}

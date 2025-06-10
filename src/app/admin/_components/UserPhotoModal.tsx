@@ -5,6 +5,7 @@ import { FileUpload } from "@/app/components/FileUpload";
 import Image from "next/image";
 import { updateUserPhoto } from "@/app/contexts/user/user.actions";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface User {
   whatsapp: string;
@@ -28,9 +29,12 @@ export function UserPhotoModal({ isOpen, onClose, user }: UserPhotoModalProps) {
       setIsUpdating(true);
       await updateUserPhoto(user.whatsapp, url);
       onClose();
-      window.location.reload();
-    } catch (error) {
-      console.error("Erro ao atualizar foto:", error);
+      toast.success("Foto atualizada com sucesso");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch {
+      toast.error("Erro ao atualizar foto");
     } finally {
       setIsUpdating(false);
     }
