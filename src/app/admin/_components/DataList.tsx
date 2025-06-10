@@ -103,10 +103,10 @@ export function DataList<T>({
             </div>
           ))}
           {(onEdit || onDelete) && (
-            <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-white/10 font-bold">
+            <div className="grid grid-cols-1 justify-center items-center gap-2 mt-4 pt-4 border-t border-white/10 font-bold">
               <button
                 onClick={() => setSelectedItem(item)}
-                className="flex items-center gap-2 px-3 py-2 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white"
+                className="flex items-center justify-center gap-2 px-3 py-3 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white"
               >
                 <Eye className="w-4 h-4" />
                 <span className="text-xs">Detalhes</span>
@@ -114,7 +114,7 @@ export function DataList<T>({
               {onEdit && onEditCondition?.(item) && (
                 <button
                   onClick={() => onEdit(item)}
-                  className="flex items-center gap-2 px-3 py-2 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white"
+                  className="flex items-center justify-center gap-2 px-3 py-3 bg-foreground hover:bg-foreground/90 rounded-lg transition-colors text-white"
                 >
                   <Pencil className="w-4 h-4" />
                   <span className="text-xs">Editar</span>
@@ -123,7 +123,7 @@ export function DataList<T>({
               {onDelete && onDeleteCondition?.(item) && (
                 <button
                   onClick={() => onDelete(item)}
-                  className="flex items-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-600/90 rounded-lg transition-colors text-white"
+                  className="flex items-center justify-center gap-2 px-3 py-3 bg-red-600 hover:bg-red-600/90 rounded-lg transition-colors text-white"
                 >
                   <Trash className="w-4 h-4" />
                   <span className="text-xs">Excluir</span>
@@ -135,7 +135,7 @@ export function DataList<T>({
                   <button
                     key={index}
                     onClick={() => action.onClick(item)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-white ${action.className ?? "bg-foreground hover:bg-foreground/90"}`}
+                    className={`flex items-center justify-center gap-1 px-3 py-3 rounded-lg transition-colors text-white ${action.className ?? "bg-foreground hover:bg-foreground/90"}`}
                   >
                     {action.icon}
                     <span className="text-xs">{action.label}</span>

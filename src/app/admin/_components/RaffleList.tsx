@@ -8,8 +8,9 @@ import CopyText from "./CopyText";
 import { useState } from "react";
 import EditRaffleModal from "./EditRaffleModal";
 import CreateRaffleModal from "./CreateRaffleModal";
-import { Gift } from "lucide-react";
+import { Gift, Replace } from "lucide-react";
 import { DrawModal } from "./DrawModal";
+import AdjustQuotasModal from "./AdjustQuotasModal";
 
 type RaffleListProps = {
   raffles: {
@@ -42,6 +43,7 @@ export function RaffleList({ raffles }: RaffleListProps) {
   const [isEditRaffleModalOpen, setIsEditRaffleModalOpen] = useState(false);
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
+  const [isAdjustQuotasModalOpen, setIsAdjustQuotasModalOpen] = useState(false);
 
   return (
     <>
@@ -84,7 +86,7 @@ export function RaffleList({ raffles }: RaffleListProps) {
             key: "quotasSold",
             label: "Cotas",
             render: (value) => (
-              <div className="flex gap-1 w-[150px] items-center">
+              <div className="flex flex-col gap-1 w-[70px] items-center">
                 <span className="text-xs px-2 py-1 rounded-xl font-bold bg-foreground/70 text-white">
                   {(999999 - (value as number)).toString().padStart(6, "0")} L
                 </span>
@@ -162,6 +164,16 @@ export function RaffleList({ raffles }: RaffleListProps) {
         }}
         customActions={[
           {
+            icon: <Replace className="w-4 h-4" />,
+            label: "Ajustar cotas vendidas",
+            onClick: (raffle) => {
+              setSelectedRaffle(raffle as unknown as Raffle);
+              setIsAdjustQuotasModalOpen(true);
+            },
+            condition: (raffle) =>
+              raffle.status === "active" && raffle.quotasSold > 0,
+          },
+          {
             icon: <Gift className="w-4 h-4" />,
             label: "Sortear",
             onClick: (raffle) => {
@@ -192,6 +204,11 @@ export function RaffleList({ raffles }: RaffleListProps) {
         onDraw={() => {
           window.location.reload();
         }}
+        raffleId={selectedRaffle?.id ?? ""}
+      />
+      <AdjustQuotasModal
+        isOpen={isAdjustQuotasModalOpen}
+        onClose={() => setIsAdjustQuotasModalOpen(false)}
         raffleId={selectedRaffle?.id ?? ""}
       />
     </>

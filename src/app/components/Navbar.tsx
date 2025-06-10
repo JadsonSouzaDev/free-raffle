@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { getCookie } from "cookies-next";
 import { useEffect, useState } from "react";
-import * as jose from "jose";
 
 export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,6 +13,7 @@ export function Navbar() {
   useEffect(() => {
     async function checkAuth() {
       const token = getCookie("token");
+      const user = getCookie("user");
 
       if (!token) {
         setIsLoggedIn(false);
@@ -22,13 +22,9 @@ export function Navbar() {
       }
 
       try {
-        const secret = new TextEncoder().encode("c4r4d3b0n3");
-
-        const { payload } = await jose.jwtVerify(token as string, secret);
-        const roles = payload.roles as string[] | undefined;
-
+        const userData = JSON.parse(user as string);
         setIsLoggedIn(true);
-        setIsAdmin(roles?.includes("admin") || false);
+        setIsAdmin(userData.roles?.includes("admin") || false);
       } catch (error) {
         console.error("Erro ao verificar token:", error);
         setIsLoggedIn(false);

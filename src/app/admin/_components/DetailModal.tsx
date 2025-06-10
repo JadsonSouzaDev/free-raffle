@@ -23,7 +23,7 @@ export function DetailModal<T>({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 backdrop-blur-xs text-foreground z-50">
-      <div className=" rounded-xl p-4 md:p-6 w-full max-w-2xl text-foreground bg-white">
+      <div className="rounded-xl p-4 md:p-6 w-full max-w-2xl text-foreground bg-white">
         <div className="flex flex-row justify-between items-center mb-4 md:mb-8">
           <h2 className="text-xl font-bold">Detalhes</h2>
           <button

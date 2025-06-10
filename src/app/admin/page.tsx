@@ -110,15 +110,6 @@ export default async function AdminPage() {
             </div>
           ),
         },
-        {
-          label: "Infos",
-          content: (
-            <div>
-              <h2 className="text-xl font-bold mb-4">Infos</h2>
-              {/* Conteúdo da tab de configurações */}
-            </div>
-          ),
-        },
       ]}
     />
   );
