@@ -11,7 +11,38 @@ const robotoSlab = Roboto_Slab({
 
 export const metadata: Metadata = {
   title: "Cara de boné",
-  description: "Cara de boné",
+  description: "Cara de boné - O",
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png" }
+    ],
+  },
+  appleWebApp: {
+    title: "Cara de boné",
+    statusBarStyle: "black-translucent",
+    capable: true,
+    startupImage: [
+      { url: "/web-app-manifest-192x192.png" },
+      { url: "/web-app-manifest-512x512.png" },
+    ]
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  themeColor: "#000000",
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+  }
 };
 
 export default function RootLayout({
