@@ -11,7 +11,7 @@ const robotoSlab = Roboto_Slab({
 
 export const metadata: Metadata = {
   title: "Cara de boné",
-  description: "Cara de boné - O",
+  description: "Cara de boné",
   manifest: "/site.webmanifest",
   icons: {
     icon: [
