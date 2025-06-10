@@ -25,6 +25,8 @@ export async function createPayment(orderId: string, amount: number) {
   const orderData = order[0];
   const whatsapp = orderData.whatsapp.replace('+55', '').replace(/\D/g, '');
   const payerEmail = `${whatsapp}@caradebone.com`;
+  const payerName = orderData.name.split(' ')[0] || 'Pix';
+  const payerLastName = orderData.name.split(' ').slice(1).join(' ') || 'Pix';
 
   // Create payment in Mercado Pago
   const payment = await createPixPayment({
@@ -32,6 +34,8 @@ export async function createPayment(orderId: string, amount: number) {
     amount,
     description: `${orderData.quotas_quantity} cota(s) para ${orderData.title}`,
     payerEmail,
+    payerName,
+    payerLastName,
   });
 
   // Save payment details in database

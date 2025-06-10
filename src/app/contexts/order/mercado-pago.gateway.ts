@@ -9,6 +9,8 @@ interface CreatePixPaymentInput {
   amount: number;
   description: string;
   payerEmail: string;
+  payerName: string;
+  payerLastName: string;
 }
 
 export async function createPixPayment(input: CreatePixPaymentInput) {
@@ -24,6 +26,8 @@ export async function createPixPayment(input: CreatePixPaymentInput) {
       description: input.description,
       payment_method_id: "pix",
       payer: {
+        first_name: input.payerName,
+        last_name: input.payerLastName,
         email: input.payerEmail,
       },
       metadata: {
