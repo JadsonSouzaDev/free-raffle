@@ -8,6 +8,7 @@ import { NumericFormat } from "react-number-format";
 import { FileUpload } from "@/app/components/FileUpload";
 import Image from "next/image";
 import { createRaffle } from "@/app/contexts/raffle/raffle.actions";
+import { toast } from "sonner";
 
 const createRaffleSchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
@@ -143,6 +144,7 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
   const onSubmit = async (data: CreateRaffleFormData) => {
     await createRaffle(data);
     handleClose();
+    toast.success("Sorteio criado com sucesso");
   };
 
   // Observa todos os preços para mostrar mensagens de erro específicas

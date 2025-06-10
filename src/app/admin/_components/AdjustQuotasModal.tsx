@@ -24,13 +24,14 @@ const AdjustQuotasModal = ({
 }: AdjustQuotasModalProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [newReferenceNumber, setNewReferenceNumber] = useState("");
+  const [isPristine, setIsPristine] = useState(true);
 
   const {
     trigger: searchQuotaTrigger,
     data: quotaData,
     isMutating: isSearching,
   } = useSWRMutation("searchQuota", async () => {
-    if (!searchTerm) return null;
+    if (!searchTerm) return undefined;
     return await searchQuota(raffleId, Number(searchTerm));
   });
 
@@ -60,6 +61,7 @@ const AdjustQuotasModal = ({
       if (result?.success) {
         toast.success(result.message);
         onClose();
+        setIsPristine(true);
       }
     } catch (error) {
       const err = error as QuotaError;
@@ -75,7 +77,12 @@ const AdjustQuotasModal = ({
         <div className="flex flex-row justify-between items-center mb-4 md:mb-8">
           <h2 className="text-xl font-bold">Ajustar Número da Cota</h2>
           <button
-            onClick={onClose}
+            onClick={() => {
+              setSearchTerm("");
+              setNewReferenceNumber("");
+              setIsPristine(true);
+              onClose();
+            }}
             className="text-foreground cursor-pointer hover:text-foreground/80"
           >
             <X className="w-6 h-6" />
@@ -90,10 +97,11 @@ const AdjustQuotasModal = ({
             <div className="flex gap-2 w-full">
               <input
                 type="number"
-                className="w-1/2 p-2 border rounded-md"
+                className="md:w-1/2 p-2 border rounded-md"
                 placeholder="Buscar cota por número..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onBlur={() => setIsPristine(false)}
               />
               <button
                 onClick={handleSearch}
@@ -154,7 +162,7 @@ const AdjustQuotasModal = ({
             </div>
           )}
 
-          {!quotaData && (
+          {quotaData === null && !isPristine && (
             <div className="flex flex-col gap-2 items-center justify-center text-red-500 border border-red-500 rounded-lg p-4">
               <p className="text-sm font-bold">Cota não encontrada</p>
               <p className="text-xs">

@@ -22,6 +22,7 @@ import {
   updateRaffle,
 } from "@/app/contexts/raffle/raffle.actions";
 import useSWR from "swr";
+import { toast } from "sonner";
 
 const editRaffleSchema = z
   .object({
@@ -295,8 +296,9 @@ const EditRaffleModal = ({
       await mutateRaffle();
       onSuccess?.();
       onClose();
-    } catch (error) {
-      console.error("Erro ao atualizar rifa:", error);
+      toast.success("Sorteio atualizado com sucesso");
+    } catch {
+      toast.error("Erro ao atualizar sorteio");
     } finally {
       setUpdatingRaffle(false);
     }

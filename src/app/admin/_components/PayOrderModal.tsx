@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { payOrderManually } from "@/app/contexts/order/payment.actions";
+import { toast } from "sonner";
 
 interface PayOrderModalProps {
   isOpen: boolean;
@@ -24,8 +25,9 @@ export default function PayOrderModal({ isOpen, onClose, order }: PayOrderModalP
       await payOrderManually(order.id);
       onClose();
       window.location.reload();
-    } catch (error) {
-      console.error("Erro ao confirmar pagamento:", error);
+      toast.success("Pagamento confirmado com sucesso");
+    } catch {
+      toast.error("Erro ao confirmar pagamento");
     } finally {
       setIsUpdating(false);
     }

@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import UserSelect from "./UserSelect";
 import { updateOrderUser } from "@/app/contexts/order/order.actions";
+import { toast } from "sonner";
 
 interface ChangeOwnerModalProps {
   isOpen: boolean;
@@ -28,8 +29,9 @@ export function ChangeOwnerModal({ isOpen, onClose, order }: ChangeOwnerModalPro
       await updateOrderUser(order.id, selectedUserId);
       onClose();
       window.location.reload();
-    } catch (error) {
-      console.error("Erro ao atualizar titular:", error);
+      toast.success("Titular atualizado com sucesso");
+    } catch {
+      toast.error("Erro ao atualizar titular");
     } finally {
       setIsUpdating(false);
     }
