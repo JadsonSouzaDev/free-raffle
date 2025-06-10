@@ -84,27 +84,61 @@ function PedidosContent() {
   }, [whatsappParam]);
 
   useEffect(() => {
-    if (!currentWhatsapp) return;
+    if (!currentWhatsapp || !orderIdParam) return;
 
-    const eventSource = new EventSource("/api/webhooks/mercadopago");
+    const startTime = Date.now();
+    const TIMEOUT = 5 * 60 * 1000; // 5 minutos em milissegundos
+    let eventSource: EventSource | null = null;
 
-    eventSource.onmessage = async (event) => {
-      const data = JSON.parse(event.data);
+    const createEventSource = () => {
+      // Se já existe uma conexão, feche-a
+      if (eventSource) {
+        eventSource.close();
+      }
 
-      if (data.type === "payment") {
-        await handleWhatsappSubmit(currentWhatsapp);
+      // Verifica se já passou do timeout
+      if (Date.now() - startTime >= TIMEOUT) {
+        console.log("Timeout atingido após 5 minutos");
+        return;
+      }
+
+      // Cria nova conexão
+      eventSource = new EventSource(`/api/webhooks/mercadopago?orderId=${orderIdParam}`);
+
+      eventSource.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "payment" && data.orderId === orderIdParam) {
+          await handleWhatsappSubmit(currentWhatsapp);
+          if (eventSource) {
+            eventSource.close();
+          }
+        }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error("SSE Error:", error);
+        if (eventSource) {
+          eventSource.close();
+        }
+
+        // Tenta reconectar após 1 segundo se ainda estiver dentro do timeout
+        if (Date.now() - startTime < TIMEOUT) {
+          setTimeout(createEventSource, 1000);
+        }
+      };
+    };
+
+    // Inicia a primeira conexão
+    createEventSource();
+
+    // Cleanup function
+    return () => {
+      if (eventSource) {
+        eventSource.close();
       }
     };
-
-    eventSource.onerror = (error) => {
-      console.error("SSE Error:", error);
-      eventSource.close();
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, [currentWhatsapp]);
+  }, [currentWhatsapp, orderIdParam]);
 
   useEffect(() => {
     const interval = setInterval(() => {

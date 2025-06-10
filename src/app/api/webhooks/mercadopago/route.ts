@@ -29,15 +29,33 @@ export async function GET(request: NextRequest) {
   const writer = stream.writable.getWriter();
   const encoder = new TextEncoder();
 
+  const sql = neon(process.env.DATABASE_URL!);
+
+  const orderId = request.nextUrl.searchParams.get('orderId');
+
+  if (!orderId) {
+    return new Response("Order ID is required", { status: 400 });
+  }
+
+  const paymentStatus = await sql`
+    SELECT status FROM payments WHERE order_id = ${orderId}
+  `;
+
   // Função para enviar eventos para o cliente
   const sendEvent = async (data: PaymentEvent) => {
     const eventString = `data: ${JSON.stringify(data)}\n\n`;
     await writer.write(encoder.encode(eventString));
   };
 
+  if (paymentStatus.length > 0 && paymentStatus[0].status === "completed") {
+    sendEvent({ type: 'payment', orderId: orderId! });
+  }
+
   // Listener para eventos de pagamento
-  const onPayment = (orderId: string) => {
-    sendEvent({ type: 'payment', orderId });
+  const onPayment = (orderIdParam: string) => {
+    if (orderId === orderIdParam) {
+      sendEvent({ type: 'payment', orderId: orderIdParam });
+    }
   };
 
   // Registra o listener
