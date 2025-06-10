@@ -150,14 +150,20 @@ const OrderModal = ({
                 <label className="block text-sm font-medium mb-1 opacity-70">
                   Informe seu nome
                 </label>
-                <input
-                  disabled={loading || !!user}
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Seu nome completo"
-                  className="w-full p-2 border rounded-lg disabled:opacity-50"
-                />
+                <div className="flex flex-col gap-1">
+                  <input
+                    disabled={loading || !!user}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome completo"
+                    className="w-full p-2 border rounded-lg disabled:opacity-50"
+                    maxLength={50}
+                  />
+                  <span className="text-xs text-gray-500 text-right">
+                    {50 - name.length} caracteres restantes
+                  </span>
+                </div>
               </div>
               <button
                 onClick={handleSubmit}
