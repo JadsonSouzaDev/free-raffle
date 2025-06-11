@@ -145,7 +145,7 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const orders = await sql`
-    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.amount, r.title as raffle_title
+    SELECT o.*, p.gateway_qrcode, p.gateway_qrcode_base64, p.gateway, p.amount, r.title as raffle_title
     FROM orders o
     LEFT JOIN payments p ON o.id = p.order_id
     LEFT JOIN raffles r ON o.raffle_id = r.id
@@ -173,7 +173,7 @@ export async function getOrdersByUser(rawWhatsapp: string) {
       quantity: order.quotas_quantity,
       status: order.status,
       createdAt: order.created_at,
-      payment: order.gateway_qrcode
+      payment: order.gateway_qrcode || order.gateway === "MANUAL"
         ? {
             amount: order.amount,
             qrCode: order.gateway_qrcode,
