@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
 CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id UUID REFERENCES orders(id),
+  order_id UUID REFERENCES orders(id) UNIQUE,
   gateway VARCHAR(255) NOT NULL,
   gateway_id VARCHAR(255) NOT NULL,
   gateway_url TEXT,

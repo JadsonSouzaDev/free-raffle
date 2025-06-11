@@ -20,7 +20,11 @@ export const dbConfig = {
       user: process.env.TARGET_DB_USER,
       password: process.env.TARGET_DB_PASSWORD,
       database: process.env.TARGET_DB_NAME,
-      port: process.env.TARGET_DB_PORT
+      port: process.env.TARGET_DB_PORT,
+      ssl: {
+        rejectUnauthorized: false,
+        sslmode: 'require'
+      }
     }
   }
 }; 

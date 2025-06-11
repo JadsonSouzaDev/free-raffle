@@ -41,15 +41,19 @@ const QuantitySelector = ({ raffle }: { raffle: SerializedRaffle }) => {
           ...new Set(raffle.preQuantityNumbers),
         ]
           .sort((a, b) => a - b)
-          .map((value) => (
+          .map((value) => ({value, isHighestPrice: raffle.prices.some(p => p.quantity === value && p.price === Math.max(...raffle.prices.map(price => price.price)))}))
+          .map(({value, isHighestPrice}, index, array) => {
+            const isMostPopular = array.some(p => p.isHighestPrice) ? isHighestPrice : array.length - 1 === index;
+            return (
             <QuantityButton
               disabled={selectedQuantity + value > raffle.maxQuantity}
               key={value}
               value={value}
-              raffle={raffle}
               onClick={() => handleQuantityClick(value)}
+              isMostPopular={isMostPopular}
             />
-          ))}
+          );
+        })}
       </div>
 
       <div className="flex flex-col gap-2 ">

@@ -431,7 +431,6 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
                 <div className="flex md:flex-row flex-col gap-4">
                   <button
                     type="button"
-                    disabled={awardFields.length === 1}
                     onClick={() => removeAward(index)}
                     className="md:hidden -mb-10 cursor-pointer p-2 text-red-500 hover:text-red-700 self-end disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -472,7 +471,6 @@ const CreateRaffleModal = ({ open, onClose }: CreateRaffleModalProps) => {
                   </div>
                   <button
                     type="button"
-                    disabled={awardFields.length === 1}
                     onClick={() => removeAward(index)}
                     className="hidden md:block cursor-pointer p-2 text-red-500 hover:text-red-700 self-end mb-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >

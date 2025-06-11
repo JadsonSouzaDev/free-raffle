@@ -7,6 +7,8 @@ import { formatDate } from "../utils/data";
 const Winners = async () => {
   const winners = await getWinners();
 
+  if (winners.length === 0) return <></>;
+
   return (
     <div className="flex flex-col gap-4 pt-4">
       <div className="flex items-center gap-2">

@@ -1,24 +1,15 @@
-interface SerializedRaffle {
-  prices: {
-    id: string;
-    price: number;
-    quantity: number;
-  }[];
-}
-
 const QuantityButton = ({
   value,
-  raffle,
   onClick,
   disabled,
+  isMostPopular,
 }: {
+  isMostPopular: boolean;
   disabled: boolean;
   value: number;
-  raffle: SerializedRaffle;
   onClick: () => void;
 }) => {
-  const isMostPopular =
-    value === Math.max(...raffle.prices.map((p) => p.quantity));
+
   return (
     <button
       key={value}

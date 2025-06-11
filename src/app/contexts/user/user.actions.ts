@@ -94,7 +94,7 @@ export async function getUsers({ search, pagination }: { search?: string, pagina
   const countQuery = await sql`SELECT COUNT(*) FROM users ${where}`;
   const count = countQuery[0].count;
 
-  const rawUsers = await sql`SELECT * FROM users ${where} ORDER BY created_at DESC LIMIT ${pagination.limit} OFFSET ${(pagination.page - 1) * pagination.limit}`;
+  const rawUsers = await sql`SELECT * FROM users ${where} ORDER BY name DESC LIMIT ${pagination.limit} OFFSET ${(pagination.page - 1) * pagination.limit}`;
   const user = rawUsers.map((user) => new User(user as unknown as UserData));
   const data = user.map((user) => ({
     whatsapp: user.whatsapp,
