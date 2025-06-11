@@ -131,14 +131,15 @@ const AdjustQuotasModal = ({
                   Telefone:{" "}
                   <span className="font-medium">{quotaData.owner_phone}</span>
                 </p>
-                {quotaData.is_awarded && (
+                {/* Desabilitando bloqueio de cota premiada */}
+                {/* {quotaData.is_awarded && (
                   <p className="text-red-500 font-medium">
                     Esta cota é premiada e não pode ser alterada
                   </p>
-                )}
+                )} */}
               </div>
 
-              {!quotaData.is_awarded && (
+              {/* {!quotaData.is_awarded && ( */}
                 <>
                   <div className="mt-4">
                     <input
@@ -158,7 +159,7 @@ const AdjustQuotasModal = ({
                     {isAdjusting ? "Processando..." : "Ajustar Número"}
                   </button>
                 </>
-              )}
+              {/* )} */}
             </div>
           )}
 

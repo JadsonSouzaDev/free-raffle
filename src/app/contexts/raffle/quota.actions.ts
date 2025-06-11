@@ -64,7 +64,19 @@ export async function adjustQuotaNumber(
   `;
 
   if (isAwarded.length > 0) {
-    throw new Error("Não é possível alterar o número de uma cota premiada");
+    // throw new Error("Não é possível alterar o número de uma cota premiada");
+    await sql`
+      UPDATE quotas 
+      SET raffle_awarded_quote_id = NULL 
+      WHERE id = ${quotaId}
+      AND active = true
+    `;
+
+    await sql`
+      UPDATE raffles_awarded_quotes 
+      SET user_id = NULL 
+      WHERE id = ${isAwarded[0].id}
+    `;
   }
 
   // Verifica se o novo número é premiado
