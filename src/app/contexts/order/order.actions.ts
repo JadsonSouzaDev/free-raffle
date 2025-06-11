@@ -236,7 +236,7 @@ export async function getOrders({ raffleId, userId, pagination } : { raffleId?: 
           ? "expired"
           : order.status,
       createdAt: order.created_at,
-      payment: order.gateway_qrcode
+      payment: order.gateway_qrcode || order.gateway === "MANUAL"
         ? {
             amount: order.amount,
             qrCode: order.gateway_qrcode,
