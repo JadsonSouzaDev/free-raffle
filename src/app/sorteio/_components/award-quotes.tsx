@@ -18,6 +18,8 @@ type AwardQuotesProps = {
 const AwardQuotes = ({ awardedQuotes }: AwardQuotesProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
+  if (awardedQuotes?.length === 0) return <></>;
+
   return (
     <div className="flex flex-col gap-2">
       <div 
