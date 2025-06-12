@@ -77,6 +77,7 @@ export function UserList({
             icon: <Camera className="w-4 h-4" />,
             label: "Editar foto",
             onClick: (user) => setSelectedUser(user),
+            condition: ()=>true,
             className: "hover:bg-white/10 bg-foreground/70 text-white md:bg-transparent md:hover:bg-white/10"
           }
         ]}
@@ -121,9 +122,6 @@ export function UserList({
             ),
           },
         ]}
-        onDeleteCondition={(user) => {
-          return !user.roles.includes("admin");
-        }}
       />
 
       <UserPhotoModal

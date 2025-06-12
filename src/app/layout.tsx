@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto_Slab } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./components/Navbar";
@@ -9,10 +9,16 @@ const robotoSlab = Roboto_Slab({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "Cara de boné",
   description: "Cara de boné",
-  manifest: "/site.webmanifest",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -22,26 +28,6 @@ export const metadata: Metadata = {
     apple: [
       { url: "/apple-touch-icon.png" }
     ],
-  },
-  appleWebApp: {
-    title: "Cara de boné",
-    statusBarStyle: "black-translucent",
-    capable: true,
-    startupImage: [
-      { url: "/web-app-manifest-192x192.png" },
-      { url: "/web-app-manifest-512x512.png" },
-    ]
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
-  themeColor: "#000000",
-  other: {
-    "mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-capable": "yes",
   }
 };
 

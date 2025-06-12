@@ -171,7 +171,7 @@ export function DataList<T>({
               </div>
             </th>
           ))}
-          {(onEdit || onDelete) && (
+          {(onEdit || onDelete || customActions) && (
             <th className="px-4 py-3 text-right">Ações</th>
           )}
         </tr>
@@ -189,7 +189,7 @@ export function DataList<T>({
                   : String(item[field.key] ?? "-")}
               </td>
             ))}
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete || customActions) && (
               <td className="px-4 py-3 text-right">
                 <div className="flex items-center justify-end gap-2">
                   <button
