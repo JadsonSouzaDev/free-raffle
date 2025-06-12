@@ -204,6 +204,7 @@ async function SorteioPage({ params }: SorteioPageProps) {
               gift: quote.gift,
               referenceNumber: quote.referenceNumber,
               user: quote.user,
+              showWinner: quote.showWinner
             }))}
           />
         </>
