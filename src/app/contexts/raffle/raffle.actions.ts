@@ -42,6 +42,7 @@ export type RaffleResponse = {
       whatsapp: string;
       name: string;
     };
+    showWinner: boolean;
     createdAt: Date;
     updatedAt: Date;
     active: boolean;
@@ -187,6 +188,7 @@ export async function getRaffleById(id: string): Promise<RaffleResponse>{
       gift: quote.gift,
       userId: quote.user?.whatsapp,
       userName: quote.user?.name,
+      showWinner: quote.showWinner,
       createdAt: quote.createdAt,
       updatedAt: quote.updatedAt,
       active: quote.active,
@@ -361,6 +363,7 @@ export type UpdateRaffleFormData = Omit<CreateRaffleFormData, 'prices' | 'awarde
     id?: string;
     reference_number: number;
     award: string;
+    show_winner: boolean;
   }>;
 };
 
@@ -414,9 +417,9 @@ export async function updateRaffle(raffleId: string, formData: UpdateRaffleFormD
   // Atualiza ou cria novas cotas premiadas
   for (const quote of awardedQuotes) {
     if (quote.id) {
-      await sql`UPDATE raffles_awarded_quotes SET reference_number = ${quote.reference_number}, gift = ${quote.award} WHERE id = ${quote.id}`;
+      await sql`UPDATE raffles_awarded_quotes SET reference_number = ${quote.reference_number}, gift = ${quote.award}, show_winner = ${quote.show_winner} WHERE id = ${quote.id}`;
     } else {
-      const result = await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number, gift) VALUES (${raffleId}, ${quote.reference_number}, ${quote.award}) RETURNING id`;
+      const result = await sql`INSERT INTO raffles_awarded_quotes (raffle_id, reference_number, gift, show_winner) VALUES (${raffleId}, ${quote.reference_number}, ${quote.award}, ${quote.show_winner}) RETURNING id`;
       const awardedQuoteId = result[0].id;
       // Verifica se a cota premiada já foi comprada
       const quota = await sql`SELECT q.id, o.user_id FROM quotas q join orders o on q.order_id = o.id WHERE q.raffle_id = ${raffleId} AND q.serial_number = ${quote.reference_number} limit 1`;

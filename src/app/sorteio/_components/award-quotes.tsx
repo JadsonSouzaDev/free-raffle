@@ -12,6 +12,7 @@ type AwardQuotesProps = {
       whatsapp: string;
       name: string;
     };
+    showWinner: boolean;
   }[];
 }
 
@@ -40,13 +41,13 @@ const AwardQuotes = ({ awardedQuotes }: AwardQuotesProps) => {
           {awardedQuotes?.map((quote) => (
             <div
               key={quote.id}
-              className={`grid grid-cols-3 w-full py-2 px-3 rounded-lg text-sm text-white ${!quote.user ? 'bg-foreground/50' : 'bg-red-700'} items-center`}
+              className={`grid grid-cols-3 w-full py-2 px-3 rounded-lg text-sm text-white ${!quote.user || !quote.showWinner ? 'bg-foreground/50' : 'bg-red-700'} items-center`}
             >
-              <span className={`flex w-[70px] items-center justify-center px-2 py-1 rounded-lg font-bold ${!quote.user ? 'text-white bg-white/40 ' : 'bg-white text-foreground'}`}>{quote.referenceNumber.toString().padStart(6, '0')}</span>
+              <span className={`flex w-[70px] items-center justify-center px-2 py-1 rounded-lg font-bold ${!quote.user || !quote.showWinner ? 'text-white bg-white/40 ' : 'bg-white text-foreground'}`}>{quote.referenceNumber.toString().padStart(6, '0')}</span>
               <span className="font-normal text-center">{quote.gift}</span>
               <div className="flex items-center justify-end gap-x-2">
-                <span className="font-normal text-right">{quote.user?.name ? quote.user.name : 'Disponível'}</span>
-                {!quote.user ? <CheckCircle className="w-4 h-4" /> : <Trophy className="w-4 h-4" />}
+                <span className="font-normal text-right">{quote.user?.name && quote.showWinner ? quote.user.name : 'Disponível'}</span>
+                {!quote.user || !quote.showWinner ? <CheckCircle className="w-4 h-4" /> : <Trophy className="w-4 h-4" />}
               </div>
             </div>
           ))}

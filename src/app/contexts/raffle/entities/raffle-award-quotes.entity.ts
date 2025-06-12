@@ -4,6 +4,7 @@ export type RaffleAwardQuotesData = {
   user_id: string;
   user_name: string;
   reference_number: number;
+  show_winner: boolean; 
   gift: string;
   created_at: Date;
   updated_at: Date;
@@ -16,6 +17,7 @@ export class RaffleAwardQuotes {
     whatsapp: string;
     name: string;
   };
+  showWinner!: boolean;
   referenceNumber!: number;
   gift!: string;
   createdAt!: Date;
@@ -31,6 +33,7 @@ export class RaffleAwardQuotes {
     created_at,
     updated_at,
     active,
+    show_winner
   }: RaffleAwardQuotesData) {
     this.id = id;
     this.user = user_id && user_name ? {
@@ -42,5 +45,6 @@ export class RaffleAwardQuotes {
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.active = active;
+    this.showWinner = show_winner;
   }
 }

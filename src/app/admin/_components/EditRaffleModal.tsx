@@ -107,6 +107,7 @@ const editRaffleSchema = z
             })
             .min(1, "O número premiado deve ser maior que 0"),
           award: z.string().min(1, "A descrição do prêmio é obrigatória"),
+          show_winner: z.boolean(),
         })
       )
       .refine(
@@ -241,6 +242,7 @@ const EditRaffleModal = ({
             id: quote.id,
             reference_number: quote.referenceNumber,
             award: quote.gift,
+            show_winner: Boolean(quote.showWinner),
           })) || [],
       });
     }
@@ -592,6 +594,28 @@ const EditRaffleModal = ({
                       </span>
                     )}
                   </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm text-gray-600 mb-1">Mostrar Vencedor</label>
+                    <Controller
+                      name={`awardedNumbers.${index}.show_winner`}
+                      control={control}
+                      render={({ field }) => (
+                        <button
+                          type="button"
+                          onClick={() => field.onChange(!field.value)}
+                          className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            field.value ? "bg-red-600" : "bg-gray-200"
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              field.value ? "translate-x-6" : "translate-x-1"
+                            }`}
+                          />
+                        </button>
+                      )}
+                    />
+                  </div>
                   <button
                     type="button"
                     disabled={awardFields.length === 1}
@@ -610,7 +634,7 @@ const EditRaffleModal = ({
             ))}
             <button
               type="button"
-              onClick={() => appendAward({ reference_number: 1, award: "" })}
+              onClick={() => appendAward({ reference_number: 1, award: "", show_winner: false })}
               className="cursor-pointer flex items-center gap-2 text-sm p-2 border border-red-500 text-red-500 rounded-md hover:bg-red-100"
             >
               <Plus className="w-4 h-4" /> Adicionar prêmio

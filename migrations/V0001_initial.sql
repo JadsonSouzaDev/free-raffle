@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS raffles_awarded_quotes (
   user_id VARCHAR(14) REFERENCES users(whatsapp),
   gift VARCHAR(255) NOT NULL,
   reference_number INTEGER NOT NULL,
+  show_winner BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   active BOOLEAN DEFAULT true
