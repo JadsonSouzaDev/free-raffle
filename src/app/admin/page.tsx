@@ -6,6 +6,8 @@ import { RaffleList } from "./_components/RaffleList";
 import { OrderList } from "./_components/OrderList";
 import { UserList } from "./_components/UserList";
 
+export const revalidate = 0; // Desabilita o cache da página
+
 type OrderStatus =
   | "pending"
   | "waiting_payment"
