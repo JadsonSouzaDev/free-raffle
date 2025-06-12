@@ -48,7 +48,8 @@ export async function createOrder(data: CreateOrderFormData) {
   const amount = Number(prices[0].price) * Number(quantity);
 
   // Create payment
-  const payment = await createPayment(rawOrder[0].id, amount);
+  const fixedAmount = Number(amount.toFixed(2));
+  const payment = await createPayment(rawOrder[0].id, fixedAmount);
 
   // Update order status to reserved
   const updatedOrder = await sql`

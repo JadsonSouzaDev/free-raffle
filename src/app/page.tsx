@@ -6,6 +6,8 @@ import { ImageCarousel } from "./components/ImageCarousel";
 import Winners from "./components/Winners";
 import WhatsappSuport from "./components/WhatsappSuport";
 
+export const revalidate = 0;
+
 const statuses = {
   active: "Compre já!",
   finished: "Sorteio finalizado",
