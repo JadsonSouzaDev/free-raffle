@@ -45,7 +45,7 @@ export function UserList({
 
   const { data: usersData, isLoading: isLoadingUsers } = useSWR(
     `/api/users?search=${search}&page=${pagination.page}&limit=${pagination.limit}`,
-    () => getUsers({ search, pagination })
+    () => getUsers({ search: search || undefined, pagination })
   );
 
   useEffect(() => {
@@ -62,8 +62,8 @@ export function UserList({
         <h2 className="font-bold">Filtrar por</h2>
         <div className="grid md:grid-cols-2 gap-2">
           <SearchText onChange={(value) => {
-            setSearch(value);
-            setPagination(DEFAULT_PAGINATION);
+              setSearch(value);
+              setPagination(pagination || DEFAULT_PAGINATION);
           }} />
         </div>
       </div>
