@@ -2,6 +2,7 @@ const WhatsappSuport = () => {
   const whatsappNumber = process.env.WHATSAPP_NUMBER;
   return (
     <div className="fixed top-2/3 -translate-y-1/2 right-2 md:right-4 md:opacity-50 transition-all duration-700 hover:scale-110 hover:opacity-100 shadow-xl">
+      <div className="flex">
       <a
         href={`https://wa.me/${whatsappNumber}`}
         target="_blank"
@@ -11,8 +12,8 @@ const WhatsappSuport = () => {
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="#000000"
-            height="800px"
-            width="800px"
+            height="40px"
+            width="40px"
             version="1.1"
             id="Layer_1"
             viewBox="0 0 308 308"
@@ -32,6 +33,7 @@ const WhatsappSuport = () => {
           </svg>
         </div>
       </a>
+        </div>
     </div>
   );
 };
