@@ -99,6 +99,15 @@ export async function payOrderManually(orderId: string) {
   if (!order.length) {
     throw new Error("Order not found");
   }
+
+  const payment = await sql`
+    SELECT * FROM payments WHERE order_id = ${orderId} AND status in ('pending', 'waiting_payment', 'expired')
+  `;
+  
+  if (!payment.length) {
+    throw new Error("Payment not found");
+  }
+
   await sql`
     UPDATE payments SET status = 'approved', gateway_id = 'manual', gateway = 'MANUAL' WHERE order_id = ${orderId}
   `;

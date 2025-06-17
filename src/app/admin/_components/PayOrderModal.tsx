@@ -28,8 +28,9 @@ export default function PayOrderModal({ isOpen, onClose, order }: PayOrderModalP
       setTimeout(() => {
         window.location.reload();
       }, 2000);
-    } catch {
-      toast.error("Erro ao confirmar pagamento");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao confirmar pagamento: " + error);
     } finally {
       setIsUpdating(false);
     }

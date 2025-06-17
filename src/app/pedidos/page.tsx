@@ -32,6 +32,7 @@ interface Order {
 
 const statusMap = {
   pending: "Aguardando Pagamento",
+  paid: "Gerando cotas...",
   waiting_payment: "Aguardando Pagamento",
   completed: "Pago",
   canceled: "Cancelado",
@@ -41,6 +42,7 @@ const statusMap = {
 
 const statusColorMap = {
   pending: "bg-yellow-500 text-yellow-700",
+  paid: "bg-yellow-400 text-yellow-700 animate-pulse",
   waiting_payment: "bg-yellow-400 text-yellow-700",
   completed: "bg-green-500/50 text-white",
   canceled: "bg-red-500/50 text-white",
@@ -274,7 +276,9 @@ function PedidosContent() {
                   <span className="text-sm opacity-70">
                     {order.status === "completed"
                       ? `${order.quantity} cota${order.quantity > 1 ? "s" : ""}`
-                      : ""}
+                      : order.status === "paid"
+                        ? "Atualize a página para ver as cotas em alguns segundos"
+                        : ""}
                     {order.winnerQuotas && order.winnerQuotas.length > 0 && (
                       <span className="font-bold bg-yellow-500 p-1 text-white rounded-lg ml-1 animate-pulse">
                         {`${order.winnerQuotas.length} cota${
