@@ -155,7 +155,7 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   `;
 
   // If order is not completed, check if it has expired
-  const ordersToCheck = orders.filter((order) => order.status !== "completed");
+  const ordersToCheck = orders.filter((order) => !["completed", "paid"].includes(order.status));
   for (const order of ordersToCheck) {
     const timeRemaining = formatTimeRemaining(order.created_at);
     if (timeRemaining === "Tempo esgotado") {
