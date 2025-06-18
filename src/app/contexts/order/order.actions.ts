@@ -1,13 +1,12 @@
 "use server";
 
-import { getQuote } from "@/app/utils/quote";
 import { neon } from "@neondatabase/serverless";
 import { z } from "zod";
 import { createPayment } from "./payment.actions";
 import { formatTimeRemaining } from "@/app/utils/time";
 import { DEFAULT_PAGINATION, PaginationRequest } from "../common/pagination";
 
-const MAX_NUMBER = 1000000;
+const MAX_NUMBER = 999999;
 
 const createOrderSchema = z.object({
   userId: z.string().min(1),
@@ -62,11 +61,6 @@ export async function createOrder(data: CreateOrderFormData) {
 export async function orderPaid(orderId: string) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
-  // Update payment status to completed
-  await sql`
-    UPDATE payments SET status = 'completed' WHERE order_id = ${orderId}
-  `;
-
   const order = await sql`
     SELECT * FROM orders WHERE id = ${orderId} AND status IN ('waiting_payment', 'pending', 'expired') AND active = true LIMIT 1
   `;
@@ -79,66 +73,66 @@ export async function orderPaid(orderId: string) {
     UPDATE orders SET status = 'paid' WHERE id = ${orderId}
   `;
 
-  // Create quotes
   const quotasQuantity = order[0].quotas_quantity;
   const raffleId = order[0].raffle_id;
-  let createdQuotes = 0;
-  const exclude: number[] = [];
-  while (createdQuotes < quotasQuantity) {
-    const quote = getQuote(MAX_NUMBER, exclude);
-    const quotaAlreadyExists = await existsQuote(quote, raffleId);
-    if (!quotaAlreadyExists) {
-      const isAwarded = await getAwardedQuote(quote, raffleId);
-      if (isAwarded) {
-        await sql`
-          INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id)
-          VALUES (${quote}, ${raffleId}, ${orderId}, 'reserved', ${isAwarded})
 
-          UPDATE raffles_awarded_quotes SET user_id = ${order[0].user_id} WHERE id = ${isAwarded}
-        `;
-      } else {
-        await sql`
-         INSERT INTO quotas (serial_number, raffle_id, order_id, status)
-         VALUES (${quote}, ${raffleId}, ${orderId}, 'reserved')
-       `;
-      }
-      createdQuotes++;
-      exclude.push(quote);
-    } else {
-      exclude.push(quote);
-    }
+  // Get available quota numbers
+  const availableQuotasResult = await sql`
+    SELECT number 
+    FROM (SELECT generate_series(1,${MAX_NUMBER}) AS number)
+          WHERE number NOT IN (
+            SELECT serial_number FROM quotas WHERE raffle_id = ${raffleId}
+          )
+    ORDER BY random()
+  LIMIT ${quotasQuantity}
+  `;
+
+  // Get awarded quotas
+  const awardedQuotas = await sql`
+    SELECT reference_number, id FROM raffles_awarded_quotes WHERE raffle_id = ${raffleId}
+  `;
+
+  // Transform available quotas to array of objects with awardedId
+  const selectedQuotas = availableQuotasResult.map((quota) => ({
+    number: quota.number,
+    awardedId: awardedQuotas.find(
+      (awarded) => awarded.reference_number === quota.number
+    )?.id || null,
+  }));
+
+  const placeholders = selectedQuotas.map((_, index) => {
+    const rowPlaceholders = ['serial_number', 'raffle_id', 'order_id', 'status', 'raffle_awarded_quote_id'].map((_, colIndex) => `$${index * 5 + colIndex + 1}`);
+    return `(${rowPlaceholders.join(', ')})`;
+  });
+
+  const values = selectedQuotas.reduce<Array<string | number | null>>((acc, row) => {
+    const rowValues = [row.number, raffleId, orderId, 'reserved', row.awardedId];
+    return [...acc, ...rowValues];
+  }, []);
+
+  const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders.join(', ')}`;
+  await sql.query(query, values);
+
+  // Update awarded quotas user_id
+  if (selectedQuotas.some((quota) => quota.awardedId !== null)) { 
+    await sql`
+    UPDATE raffles_awarded_quotes SET user_id = ${
+      order[0].user_id
+    } WHERE id = ANY(${selectedQuotas
+      .map((quota) => quota.awardedId)
+      .filter((id) => id !== null)})
+    `;
   }
+
+  // Update payment status to completed
+  await sql`
+    UPDATE payments SET status = 'completed' WHERE order_id = ${orderId}
+  `;
 
   // Update order status to paid
   await sql`
     UPDATE orders SET status = 'completed' WHERE id = ${orderId}
   `;
-}
-
-async function getAwardedQuote(
-  serialNumber: number,
-  raffleId: string
-): Promise<string | null> {
-  const sql = neon(`${process.env.DATABASE_URL}`);
-
-  const quote = await sql`
-    SELECT id FROM raffles_awarded_quotes WHERE reference_number = ${serialNumber} AND raffle_id = ${raffleId} AND active = true LIMIT 1
-  `;
-
-  return quote.length > 0 ? quote[0].id : null;
-}
-
-async function existsQuote(
-  serialNumber: number,
-  raffleId: string
-): Promise<boolean> {
-  const sql = neon(`${process.env.DATABASE_URL}`);
-
-  const quote = await sql`
-    SELECT id FROM quotas WHERE serial_number = ${serialNumber} AND raffle_id = ${raffleId} AND active = true
-  `;
-
-  return quote.length > 0 ? true : false;
 }
 
 export async function getOrdersByUser(rawWhatsapp: string) {
@@ -155,7 +149,9 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   `;
 
   // If order is not completed, check if it has expired
-  const ordersToCheck = orders.filter((order) => !["completed", "paid"].includes(order.status));
+  const ordersToCheck = orders.filter(
+    (order) => !["completed", "paid"].includes(order.status)
+  );
   for (const order of ordersToCheck) {
     const timeRemaining = formatTimeRemaining(order.created_at);
     if (timeRemaining === "Tempo esgotado") {
@@ -174,13 +170,14 @@ export async function getOrdersByUser(rawWhatsapp: string) {
       quantity: order.quotas_quantity,
       status: order.status,
       createdAt: order.created_at,
-      payment: order.gateway_qrcode || order.gateway === "MANUAL"
-        ? {
-            amount: order.amount,
-            qrCode: order.gateway_qrcode,
-            qrCodeBase64: order.gateway_qrcode_base64,
-          }
-        : undefined,
+      payment:
+        order.gateway_qrcode || order.gateway === "MANUAL"
+          ? {
+              amount: order.amount,
+              qrCode: order.gateway_qrcode,
+              qrCodeBase64: order.gateway_qrcode_base64,
+            }
+          : undefined,
       quotas:
         order.status === "completed"
           ? (
@@ -196,7 +193,15 @@ export async function getOrdersByUser(rawWhatsapp: string) {
   return ordersWithQuotas;
 }
 
-export async function getOrders({ raffleId, userId, pagination } : { raffleId?: string, userId?: string, pagination: PaginationRequest } = {pagination: DEFAULT_PAGINATION}) {
+export async function getOrders(
+  {
+    raffleId,
+    userId,
+    pagination,
+  }: { raffleId?: string; userId?: string; pagination: PaginationRequest } = {
+    pagination: DEFAULT_PAGINATION,
+  }
+) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
   const where = sql`
@@ -237,15 +242,16 @@ export async function getOrders({ raffleId, userId, pagination } : { raffleId?: 
           ? "expired"
           : order.status,
       createdAt: order.created_at,
-      payment: order.gateway_qrcode || order.gateway === "MANUAL"
-        ? {
-            amount: order.amount,
-            qrCode: order.gateway_qrcode,
-            qrCodeBase64: order.gateway_qrcode_base64,
-            gateway: order.gateway,
-            type: "pix",
-          }
-        : undefined,
+      payment:
+        order.gateway_qrcode || order.gateway === "MANUAL"
+          ? {
+              amount: order.amount,
+              qrCode: order.gateway_qrcode,
+              qrCodeBase64: order.gateway_qrcode_base64,
+              gateway: order.gateway,
+              type: "pix",
+            }
+          : undefined,
       quotas:
         order.status === "completed"
           ? (
@@ -262,8 +268,8 @@ export async function getOrders({ raffleId, userId, pagination } : { raffleId?: 
     total: count,
     page: pagination.page,
     limit: pagination.limit,
-    totalPages: Math.ceil(count / pagination.limit)
-  }
+    totalPages: Math.ceil(count / pagination.limit),
+  };
 }
 
 export async function updateOrderUser(orderId: string, userId: string) {
@@ -326,7 +332,6 @@ export async function getWinnerQuotas(orderId: string): Promise<number[]> {
 
   return winnerQuotas.map((quota) => quota.serial_number);
 }
-
 
 export async function deleteOrder(orderId: string) {
   const sql = neon(`${process.env.DATABASE_URL}`);
