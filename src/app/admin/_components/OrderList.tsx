@@ -26,6 +26,7 @@ type OrderStatus =
 const statusMap = {
   pending: "Aguardando Pagamento",
   waiting_payment: "Aguardando Pagamento",
+  paid: "Processando cotas...",
   completed: "Pago",
   canceled: "Cancelado",
   refunded: "Reembolsado",
@@ -35,6 +36,7 @@ const statusMap = {
 const statusColors = {
   pending: "bg-yellow-500 text-white animate-pulse",
   waiting_payment: "bg-yellow-500 text-white animate-pulse",
+  paid: "bg-yellow-400 text-white animate-pulse",
   completed: "bg-green-500 text-white",
   canceled: "bg-red-500 text-white",
   refunded: "bg-red-500 text-white",

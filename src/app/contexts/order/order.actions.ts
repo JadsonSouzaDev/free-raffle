@@ -61,6 +61,7 @@ export async function createOrder(data: CreateOrderFormData) {
 export async function orderPaid(orderId: string) {
   const sql = neon(`${process.env.DATABASE_URL}`);
 
+  // Check if order exists and is waiting payment
   const order = await sql`
     SELECT * FROM orders WHERE id = ${orderId} AND status IN ('waiting_payment', 'pending', 'expired') AND active = true LIMIT 1
   `;
@@ -69,10 +70,12 @@ export async function orderPaid(orderId: string) {
     throw new Error("Order not found or not waiting payment");
   }
 
+  // Update order status to paid
   await sql`
     UPDATE orders SET status = 'paid' WHERE id = ${orderId}
   `;
 
+  // Get quotas quantity and raffle id
   const quotasQuantity = order[0].quotas_quantity;
   const raffleId = order[0].raffle_id;
 
@@ -87,7 +90,7 @@ export async function orderPaid(orderId: string) {
   LIMIT ${quotasQuantity}
   `;
 
-  // Get awarded quotas
+  // Get awarded quotas from database
   const awardedQuotas = await sql`
     SELECT reference_number, id FROM raffles_awarded_quotes WHERE raffle_id = ${raffleId}
   `;
@@ -105,11 +108,13 @@ export async function orderPaid(orderId: string) {
     return `(${rowPlaceholders.join(', ')})`;
   });
 
+  // Create values for the query
   const values = selectedQuotas.reduce<Array<string | number | null>>((acc, row) => {
     const rowValues = [row.number, raffleId, orderId, 'reserved', row.awardedId];
     return [...acc, ...rowValues];
   }, []);
 
+  // Insert quotas into database
   const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders.join(', ')}`;
   await sql.query(query, values);
 
@@ -120,7 +125,7 @@ export async function orderPaid(orderId: string) {
       order[0].user_id
     } WHERE id = ANY(${selectedQuotas
       .map((quota) => quota.awardedId)
-      .filter((id) => id !== null)})
+      .filter((id) => !!id)})
     `;
   }
 
@@ -238,7 +243,7 @@ export async function getOrders(
         order.status === "completed"
           ? order.status
           : new Date().getTime() - new Date(order.created_at).getTime() >
-            5 * 60 * 1000
+            5 * 60 * 1000 && order.status !== "paid"
           ? "expired"
           : order.status,
       createdAt: order.created_at,

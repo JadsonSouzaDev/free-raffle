@@ -98,3 +98,6 @@ ALTER TABLE
   raffles
 ADD
   COLUMN winner_quota_id UUID REFERENCES quotas(id);
+
+CREATE INDEX IF NOT EXISTS idx_quotas_raffle_id ON quotas(raffle_id);
+CREATE INDEX IF NOT EXISTS idx_quotas_raffle_id_serial_number ON quotas(raffle_id, serial_number);
