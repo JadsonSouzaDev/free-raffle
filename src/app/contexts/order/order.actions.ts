@@ -81,13 +81,16 @@ export async function orderPaid(orderId: string) {
 
   // Get available quota numbers
   const availableQuotasResult = await sql`
-    SELECT number 
-    FROM (SELECT generate_series(1,${MAX_NUMBER}) AS number)
-          WHERE number NOT IN (
-            SELECT serial_number FROM quotas WHERE raffle_id = ${raffleId}
-          )
+    SELECT number
+    FROM generate_series(1, ${MAX_NUMBER}) AS gs(number)
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM quotas q
+        WHERE q.raffle_id = ${raffleId}
+          AND q.serial_number = gs.number
+    )
     ORDER BY random()
-  LIMIT ${quotasQuantity}
+    LIMIT ${quotasQuantity};
   `;
 
   // Get awarded quotas from database
