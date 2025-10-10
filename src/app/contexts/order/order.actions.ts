@@ -117,13 +117,9 @@ export async function orderPaid(orderId: string) {
     return [...acc, ...rowValues];
   }, []);
 
-  // Create batch of quotas
-  const batchSize = 1000;
-  for (let i = 0; i < values.length; i += batchSize) {
-    const batch = values.slice(i, i + batchSize);
-    const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders.join(', ')}`;
-    await sql.query(query, batch);
-  }
+  // Insert quotas into database
+  const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders.join(', ')}`;
+  await sql.query(query, values);
 
   // Update awarded quotas user_id
   if (selectedQuotas.some((quota) => quota.awardedId !== null)) { 

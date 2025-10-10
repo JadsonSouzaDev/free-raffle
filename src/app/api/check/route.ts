@@ -75,40 +75,33 @@ ORDER BY
         )?.id || null,
     }));
 
-    const placeholders = selectedQuotas.map((_, index) => {
-      const rowPlaceholders = [
-        "serial_number",
-        "raffle_id",
-        "order_id",
-        "status",
-        "raffle_awarded_quote_id",
-      ].map((_, colIndex) => `$${index * 5 + colIndex + 1}`);
-      return `(${rowPlaceholders.join(", ")})`;
-    });
-
-    // Create values for the query
-    const values = selectedQuotas.reduce<Array<string | number | null>>(
-      (acc, row) => {
-        const rowValues = [
-          row.number,
-          raffleId,
-          orderId,
-          "reserved",
-          row.awardedId,
-        ];
-        return [...acc, ...rowValues];
-      },
-      []
-    );
-
-    // Create batch of quotas
+    // The previous method created too many placeholders at once, making a single prepared statement with all (e.g., 35k) parameters,
+    // but the `.query` call is always only given the current batch of values (e.g., 1000). So we need to create the placeholders and values for each batch, not for all rows at once.
     const batchSize = 1000;
-    for (let i = 0; i < values.length; i += batchSize) {
-      const batch = values.slice(i, i + batchSize);
-      const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders.join(
-        ", "
-      )}`;
-      await sql.query(query, batch);
+
+    for (let i = 0; i < selectedQuotas.length; i += batchSize) {
+      const batchQuotas = selectedQuotas.slice(i, i + batchSize);
+
+      // Prepare placeholders and values for just this batch
+      const placeholders = batchQuotas
+        .map(
+          (_, index) =>
+            `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${
+              index * 5 + 4
+            }, $${index * 5 + 5})`
+        )
+        .join(", ");
+
+      const values = batchQuotas.flatMap((row) => [
+        row.number,
+        raffleId,
+        orderId,
+        "reserved",
+        row.awardedId,
+      ]);
+
+      const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders}`;
+      await sql.query(query, values);
     }
 
     // Update awarded quotas user_id
