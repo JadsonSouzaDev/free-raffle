@@ -101,28 +101,41 @@ export async function orderPaid(orderId: string) {
   // Transform available quotas to array of objects with awardedId
   const selectedQuotas = availableQuotasResult.map((quota) => ({
     number: quota.number,
-    awardedId: awardedQuotas.find(
-      (awarded) => awarded.reference_number === quota.number
-    )?.id || null,
+    awardedId:
+      awardedQuotas.find((awarded) => awarded.reference_number === quota.number)
+        ?.id || null,
   }));
 
-  const placeholders = selectedQuotas.map((_, index) => {
-    const rowPlaceholders = ['serial_number', 'raffle_id', 'order_id', 'status', 'raffle_awarded_quote_id'].map((_, colIndex) => `$${index * 5 + colIndex + 1}`);
-    return `(${rowPlaceholders.join(', ')})`;
-  });
+  // The previous method created too many placeholders at once, making a single prepared statement with all (e.g., 35k) parameters,
+  // but the `.query` call is always only given the current batch of values (e.g., 1000). So we need to create the placeholders and values for each batch, not for all rows at once.
+  const batchSize = 1000;
 
-  // Create values for the query
-  const values = selectedQuotas.reduce<Array<string | number | null>>((acc, row) => {
-    const rowValues = [row.number, raffleId, orderId, 'reserved', row.awardedId];
-    return [...acc, ...rowValues];
-  }, []);
+  for (let i = 0; i < selectedQuotas.length; i += batchSize) {
+    const batchQuotas = selectedQuotas.slice(i, i + batchSize);
 
-  // Insert quotas into database
-  const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders.join(', ')}`;
-  await sql.query(query, values);
+    // Prepare placeholders and values for just this batch
+    const placeholders = batchQuotas
+      .map(
+        (_, index) =>
+          `($${index * 5 + 1}, $${index * 5 + 2}, $${index * 5 + 3}, $${
+            index * 5 + 4
+          }, $${index * 5 + 5})`
+      )
+      .join(", ");
 
+    const values = batchQuotas.flatMap((row) => [
+      row.number,
+      raffleId,
+      orderId,
+      "reserved",
+      row.awardedId,
+    ]);
+
+    const query = `INSERT INTO quotas (serial_number, raffle_id, order_id, status, raffle_awarded_quote_id) VALUES ${placeholders}`;
+    await sql.query(query, values);
+  }
   // Update awarded quotas user_id
-  if (selectedQuotas.some((quota) => quota.awardedId !== null)) { 
+  if (selectedQuotas.some((quota) => quota.awardedId !== null)) {
     await sql`
     UPDATE raffles_awarded_quotes SET user_id = ${
       order[0].user_id
@@ -246,7 +259,7 @@ export async function getOrders(
         order.status === "completed"
           ? order.status
           : new Date().getTime() - new Date(order.created_at).getTime() >
-            5 * 60 * 1000 && order.status !== "paid"
+              5 * 60 * 1000 && order.status !== "paid"
           ? "expired"
           : order.status,
       createdAt: order.created_at,
