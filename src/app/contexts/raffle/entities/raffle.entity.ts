@@ -2,6 +2,35 @@ import { RaffleAwardQuotes, RafflePrice, RaffleTopBuyer, RaffleFlag } from "./";
 import { RaffleHighestQuota } from "./raffle-highest-quota.entity";
 import { RaffleLowestQuota } from "./raffle-lowest-quota.entity";
 
+export type RaffleRankingData = {
+  id: string;
+  raffle_id: string;
+  start_date: Date;
+  end_date?: Date;
+  created_at: Date;
+  updated_at: Date;
+  active: boolean;
+};
+
+export class RaffleRanking {
+  id!: string;
+  raffleId!: string;
+  startDate!: Date;
+  endDate?: Date;
+  createdAt!: Date;
+  updatedAt!: Date;
+  active!: boolean;
+  constructor(data: RaffleRankingData) {
+    this.id = data.id;
+    this.raffleId = data.raffle_id;
+    this.startDate = data.start_date;
+    this.endDate = data.end_date;
+    this.createdAt = data.created_at;
+    this.updatedAt = data.updated_at;
+    this.active = data.active;
+  }
+}
+
 export type RaffleData = {
   id: string;
   title: string;
@@ -35,11 +64,13 @@ export class Raffle {
   topBuyers?: RaffleTopBuyer[];
   topBuyersWeek?: RaffleTopBuyer[];
   topBuyersDay?: RaffleTopBuyer[];
+  topBuyersRanking?: RaffleTopBuyer[];
   lowestQuota?: RaffleLowestQuota;
   highestQuota?: RaffleHighestQuota;
   quotasSold?: number;
   flags!: RaffleFlag;
   progress!: number;
+  rankings?: RaffleRanking[];
   constructor(data: RaffleData) {
     this.id = data.id;
     this.title = data.title;
@@ -77,6 +108,10 @@ export class Raffle {
     this.topBuyersDay = top_buyer_day;
   }
 
+  setTopBuyersRanking(top_buyer_ranking: RaffleTopBuyer[]) {
+    this.topBuyersRanking = top_buyer_ranking;
+  }
+
   setLowestQuota(lowest_quota: RaffleLowestQuota) {
     this.lowestQuota = lowest_quota;
   }
@@ -99,6 +134,14 @@ export class Raffle {
 
   setMaxQuantity(max_quantity: number) {
     this.maxQuantity = max_quantity;
+  }
+
+  setRankings(rankings: RaffleRanking[]) {
+    this.rankings = rankings;
+  }
+
+  get latestRanking(): RaffleRanking | undefined {
+    return this.rankings?.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
   }
 
   get status(): "active" | "finished" {

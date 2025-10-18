@@ -121,6 +121,25 @@ async function SorteioPage({ params }: SorteioPageProps) {
               })),
             }}
           />
+          {flags.flagTopBuyersRanking && raffle.topBuyersRanking && (
+            <TopBuyers
+              title="Top compradores"
+              subtitle={`(${new Date(raffle.latestRanking!.startDate).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })} a ${new Date(raffle.latestRanking?.endDate || new Date()).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })})`}
+              topBuyers={raffle.topBuyersRanking?.map((buyer) => ({
+                id: buyer.whatsapp,
+                name: buyer.name,
+                quantity: buyer.total,
+              }))}
+            />
+          )}
           {flags.flagTopBuyers && (
             <TopBuyers
               title="Top compradores"

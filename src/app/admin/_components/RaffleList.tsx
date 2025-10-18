@@ -8,9 +8,15 @@ import CopyText from "./CopyText";
 import { useState } from "react";
 import EditRaffleModal from "./EditRaffleModal";
 import CreateRaffleModal from "./CreateRaffleModal";
-import { Gift, Replace } from "lucide-react";
+import { Gift, Replace, Trophy } from "lucide-react";
 import { DrawModal } from "./DrawModal";
 import AdjustQuotasModal from "./AdjustQuotasModal";
+import {
+  createRaffleRanking,
+  finishRaffleRanking,
+} from "@/app/contexts/raffle/raffle.actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type RaffleListProps = {
   raffles: {
@@ -30,6 +36,11 @@ type RaffleListProps = {
       price: number;
       quantity: number;
     }[];
+    latestRanking?: {
+      id: string;
+      startDate: string;
+      endDate?: string;
+    };
   }[];
 };
 
@@ -44,6 +55,40 @@ export function RaffleList({ raffles }: RaffleListProps) {
   const [selectedRaffle, setSelectedRaffle] = useState<Raffle | null>(null);
   const [isDrawModalOpen, setIsDrawModalOpen] = useState(false);
   const [isAdjustQuotasModalOpen, setIsAdjustQuotasModalOpen] = useState(false);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  // Ranking actions
+  const handleCreateRanking = async (raffle: Raffle) => {
+    try {
+      setIsLoading(true);
+      await createRaffleRanking(raffle.id);
+      toast.success("Ranking criado com sucesso");
+      router.push(`/admin`);
+    } catch (error) {
+      console.error("Erro ao criar ranking", error);
+      toast.error("Erro ao criar ranking");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFinishRanking = async (raffle: Raffle) => {
+    try {
+      setIsLoading(true);
+      if (!raffle.latestRanking) {
+        toast.error("Não há ranking para finalizar");
+        return;
+      }
+      await finishRaffleRanking(raffle.latestRanking.id);
+      toast.success("Ranking finalizado com sucesso");
+      router.push(`/admin`);
+    } catch (error) {
+      console.error("Erro ao finalizar ranking", error);
+      toast.error("Erro ao finalizar ranking");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -164,6 +209,29 @@ export function RaffleList({ raffles }: RaffleListProps) {
         }}
         customActions={[
           {
+            icon: <Trophy className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />,
+            label: isLoading ? "Criando ranking..." : "Criar novo ranking",
+            onClick: async (raffle) => {
+              if (isLoading) return;
+              await handleCreateRanking(raffle as unknown as Raffle);
+            },
+            condition: (raffle) =>
+              raffle.status === "active" &&
+              (!raffle.latestRanking || !!raffle.latestRanking?.endDate),
+          },
+          {
+            icon: <Trophy className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />,
+            label: isLoading ? "Finalizando ranking..." : "Finalizar ranking",
+            onClick: async (raffle) => {
+              if (isLoading) return;
+              await handleFinishRanking(raffle as unknown as Raffle);
+            },
+            condition: (raffle) =>
+              raffle.status === "active" &&
+              !!raffle?.latestRanking &&
+              !raffle.latestRanking?.endDate,
+          },
+          {
             icon: <Replace className="w-4 h-4" />,
             label: "Ajustar cotas vendidas",
             onClick: (raffle) => {
@@ -182,7 +250,8 @@ export function RaffleList({ raffles }: RaffleListProps) {
             },
             condition: (raffle) =>
               raffle.status === "active" && raffle.quotasSold > 0,
-            className: "bg-yellow-500 hover:text-yellow-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
+            className:
+              "bg-yellow-500 hover:text-yellow-300 md:bg-transparent md:hover:bg-white/10 md:rounded-lg md:p-1",
           },
         ]}
       />

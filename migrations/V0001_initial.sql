@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS raffles_flags (
   flag_lowest_quota BOOLEAN DEFAULT false,
   flag_highest_quota BOOLEAN DEFAULT false,
   flag_progress BOOLEAN DEFAULT false,
+  flag_top_buyers_ranking BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -101,3 +102,13 @@ ADD
 
 CREATE INDEX IF NOT EXISTS idx_quotas_raffle_id ON quotas(raffle_id);
 CREATE INDEX IF NOT EXISTS idx_quotas_raffle_id_serial_number ON quotas(raffle_id, serial_number);
+
+CREATE TABLE IF NOT EXISTS raffles_ranking (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  raffle_id UUID REFERENCES raffles(id),
+  start_date TIMESTAMPTZ DEFAULT NOW(),
+  end_date TIMESTAMPTZ,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);

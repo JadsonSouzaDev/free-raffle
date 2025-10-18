@@ -16,6 +16,7 @@ import {
   updateHighestQuotaFlag,
   updateProgressFlag,
   getRaffleFlags,
+  updateTopBuyersRankingFlag,
 } from "@/app/contexts/raffle/raffle-flags.actions";
 import {
   getRaffleById,
@@ -144,9 +145,10 @@ type FlagState = {
   flagTopBuyers: boolean;
   flagTopBuyersWeek: boolean;
   flagTopBuyersDay: boolean;
-  flagLowestQuota: boolean;
+  flagLowestQuota: boolean;  
   flagHighestQuota: boolean;
   flagProgress: boolean;
+  flagTopBuyersRanking: boolean;
 };
 
 const defaultFlags: FlagState = {
@@ -156,6 +158,7 @@ const defaultFlags: FlagState = {
   flagLowestQuota: false,
   flagHighestQuota: false,
   flagProgress: false,
+  flagTopBuyersRanking: false,
 };
 
 const EditRaffleModal = ({
@@ -219,6 +222,7 @@ const EditRaffleModal = ({
         flagLowestQuota: flags.flagLowestQuota,
         flagHighestQuota: flags.flagHighestQuota,
         flagProgress: flags.flagProgress,
+        flagTopBuyersRanking: flags.flagTopBuyersRanking,
       });
     }
   }, [flags]);
@@ -267,6 +271,7 @@ const EditRaffleModal = ({
         flagLowestQuota: updateLowestQuotaFlag,
         flagHighestQuota: updateHighestQuotaFlag,
         flagProgress: updateProgressFlag,
+        flagTopBuyersRanking: updateTopBuyersRankingFlag,
       }[flag];
 
       await updateFlagAction(raffleId, newValue);
@@ -791,6 +796,24 @@ const EditRaffleModal = ({
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     flagsState.flagProgress ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Top Compradores Ranking */}
+            <div className="flex items-center justify-between">
+              <label className="text-sm">Exibir Top Compradores Ranking</label>
+              <button
+                onClick={() => handleToggle("flagTopBuyersRanking")}
+                className={`cursor-pointer relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  flagsState.flagTopBuyersRanking ? "bg-red-600" : "bg-gray-200"
+                }`}
+                disabled={loadingFlags.flagTopBuyersRanking}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    flagsState.flagTopBuyersRanking ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
               </button>

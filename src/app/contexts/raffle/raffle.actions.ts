@@ -9,6 +9,8 @@ import {
   RaffleFlagData,
   RafflePrice,
   RafflePriceData,
+  RaffleRanking,
+  RaffleRankingData,
   RaffleTopBuyer,
   RaffleTopBuyerData,
 } from "./entities";
@@ -119,6 +121,19 @@ export async function createRaffle(formData: CreateRaffleFormData) {
   }
 }
 
+export async function createRaffleRanking(raffleId: string){
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  //if ranking already exists, disable it
+  await sql`UPDATE raffles_ranking SET active = false WHERE raffle_id = ${raffleId}`;
+  // create ranking
+  await sql`INSERT INTO raffles_ranking (raffle_id) VALUES (${raffleId})`;
+}
+
+export async function finishRaffleRanking(rankingId: string) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
+  await sql`UPDATE raffles_ranking SET end_date = NOW() WHERE id = ${rankingId}`;
+}
+
 export async function getRaffles(): Promise<Raffle[]> {
   "use server";
   const sql = neon(`${process.env.DATABASE_URL}`);
@@ -159,6 +174,11 @@ export async function getRaffles(): Promise<Raffle[]> {
     const flags =
       await sql`SELECT * FROM raffles_flags WHERE id = ${raffle.id}`;
     raffle.setFlags(new RaffleFlag(flags[0] as unknown as RaffleFlagData));
+
+    // get rankings
+    const rankings =
+      await sql`SELECT * FROM raffles_ranking WHERE raffle_id = ${raffle.id} ORDER BY created_at DESC`;
+    raffle.setRankings(rankings.map(ranking => new RaffleRanking(ranking as unknown as RaffleRankingData)));
   }
 
   return raffles;
@@ -279,6 +299,23 @@ export async function getRaffle(id: string): Promise<Raffle> {
   const topBuyers = await baseQuery();
   const topBuyersWeek = await baseQuery(getStartOfWeek(), getEndOfWeek());
   const topBuyersDay = await baseQuery(getStartOfDay(), getEndOfDay());
+
+  // get top buyers ranking
+  const lastRankingData = await sql`SELECT * FROM raffles_ranking WHERE raffle_id = ${raffle.id} ORDER BY created_at DESC LIMIT 1`;
+  if (lastRankingData.length > 0) {
+    // define last ranking
+    const lastRanking = new RaffleRanking(lastRankingData[0] as unknown as RaffleRankingData);
+    raffle.setRankings([lastRanking]);
+    if (lastRanking.active) {
+      // if ranking is active, get top buyers ranking
+      const topBuyersRanking = await baseQuery(lastRankingData[0].start_date.toISOString(), lastRankingData[0].end_date?.toISOString() || new Date().toISOString());
+      raffle.setTopBuyersRanking(
+        topBuyersRanking.map(
+          (buyer) => new RaffleTopBuyer(buyer as unknown as RaffleTopBuyerData)
+        )
+      );
+    }
+  }
 
   raffle.setTopBuyers(
     topBuyers.map(

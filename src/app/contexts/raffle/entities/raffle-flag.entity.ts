@@ -6,6 +6,7 @@ export type RaffleFlagData = {
   flag_lowest_quota: boolean;
   flag_highest_quota: boolean;
   flag_progress: boolean;
+  flag_top_buyers_ranking: boolean;
 };
 
 export class RaffleFlag {
@@ -16,7 +17,7 @@ export class RaffleFlag {
   flagLowestQuota!: boolean;
   flagHighestQuota!: boolean;
   flagProgress!: boolean;
-
+  flagTopBuyersRanking!: boolean;
   constructor(data: RaffleFlagData) {
     this.id = data.id;
     this.flagTopBuyers = data.flag_top_buyers;
@@ -25,5 +26,6 @@ export class RaffleFlag {
     this.flagLowestQuota = data.flag_lowest_quota;
     this.flagHighestQuota = data.flag_highest_quota;
     this.flagProgress = data.flag_progress;
+    this.flagTopBuyersRanking = data.flag_top_buyers_ranking;
   }
 }

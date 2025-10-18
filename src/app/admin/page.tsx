@@ -51,6 +51,11 @@ export default async function AdminPage() {
                       referenceNumber: quote.referenceNumber,
                       gift: quote.gift,
                     })) || [],
+                  latestRanking: raffle.latestRanking ? {
+                    id: raffle.latestRanking.id,
+                    startDate: raffle.latestRanking.startDate.toISOString(),
+                    endDate: raffle.latestRanking.endDate?.toISOString() ?? undefined,
+                  } : undefined,
                 }))}
               />
             </div>
